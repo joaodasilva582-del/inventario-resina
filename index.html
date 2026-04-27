@@ -7,25 +7,48 @@
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#a51c30">
-
     <link rel="manifest" href="/inventario-resina/manifest.json">
     
     <style>
         :root { --border: #000; --header-bg: #e9e9e9; --accent: #a51c30; --btn-grey: #666666; --btn-blue: #0056b3; }
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
-        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #f4f4f4; display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        .login-box { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 90%; max-width: 350px; text-align: center; border-top: 6px solid var(--accent); }
+
+        /* TELA DE LOGIN */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #f4f4f4; display: flex; align-items: center; justify-content: center; z-index: 9999;
+        }
+        .login-box {
+            background: white; padding: 30px; border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 90%; max-width: 350px;
+            text-align: center; border-top: 6px solid var(--accent);
+        }
         .login-box h1 { color: var(--accent); margin: 0 0 5px 0; font-size: 28px; letter-spacing: 2px; font-weight: bold; }
         .login-box p { font-size: 12px; color: #666; margin-bottom: 20px; font-weight: bold; }
-        .login-box input { width: 100% !important; padding: 12px !important; margin: 10px 0 !important; border: 1px solid #aaa !important; border-radius: 6px !important; box-sizing: border-box !important; font-size: 16px !important; background-color: #ffffff !important; display: block !important; outline: none !important; }
-        .btn-login { width: 100%; padding: 14px; background-color: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        
+        .login-box input {
+            width: 100% !important; padding: 12px !important; margin: 10px 0 !important; 
+            border: 1px solid #aaa !important; border-radius: 6px !important; 
+            box-sizing: border-box !important; font-size: 16px !important;
+            background-color: #ffffff !important; display: block !important;
+            outline: none !important;
+        }
+        
+        .btn-login {
+            width: 100%; padding: 14px; background-color: var(--accent);
+            color: white; border: none; border-radius: 6px; cursor: pointer;
+            font-weight: bold; font-size: 16px; margin-top: 10px;
+        }
+
+        /* CONTEÚDO PRINCIPAL */
         #app-content { display: none; padding: 5px; background-color: #fff; }
+
         .no-print { margin-bottom: 10px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; padding: 10px; }
         .btn-pdf { padding: 10px 18px; cursor: pointer; border: 1px solid #000; background-color: var(--accent); color: white; font-weight: bold; border-radius: 4px; }
         .btn-clear { padding: 10px 18px; cursor: pointer; border: 1px solid #000; background-color: var(--btn-grey); color: white; font-weight: bold; border-radius: 4px; }
         .btn-email { padding: 10px 18px; cursor: pointer; border: 1px solid #000; background-color: var(--btn-blue); color: white; font-weight: bold; border-radius: 4px; }
+        
         .container { width: 100%; overflow-x: auto; }
         table { border-collapse: collapse; width: 100%; min-width: 1000px; table-layout: fixed; } 
         th, td { border: 1px solid var(--border); padding: 4px 2px; text-align: center; word-wrap: break-word; }
@@ -34,15 +57,28 @@
         .editable { background-color: #fffdec; border: 1px solid #ccc !important; }
         input[type="number"], input[type="text"] { width: 95%; border: none; text-align: center; background: transparent; font-size: 13px; font-weight: bold; }
         .res-val { font-weight: bold; font-size: 14px; }
-        #custom-alert { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center; }
-        .alert-content { background: white; padding: 25px; border-radius: 10px; text-align: center; max-width: 400px; width: 85%; border-top: 8px solid var(--accent); box-shadow: 0 15px 30px rgba(0,0,0,0.3); }
+
+        /* MODAL DE AVISO PERSONALIZADO */
+        #custom-alert {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center;
+        }
+        .alert-content {
+            background: white; padding: 25px; border-radius: 10px; text-align: center;
+            max-width: 400px; width: 85%; border-top: 8px solid var(--accent);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
         .alert-content h2 { color: var(--accent); margin-top: 0; }
         .alert-content p { color: #333; font-weight: bold; margin: 20px 0; line-height: 1.4; }
+        
         .alert-buttons { display: flex; gap: 10px; justify-content: center; }
         .btn-alert-ok { background: var(--accent); color: white; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 15px; }
         .btn-alert-cancel { background: var(--btn-grey); color: white; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 15px; }
+
+        /* ESTILOS DE LOGO E CÓDIGOS */
         .logo-text { font-weight: bold; font-size: 30px !important; color: var(--accent) !important; }
         .sub-cod { font-size: 10px !important; font-weight: normal !important; color: #ddd !important; display: block; }
+
         @media print {
             @page { size: portrait; margin: 0.5cm; }
             .no-print, #login-screen, #custom-alert { display: none !important; }
@@ -191,13 +227,14 @@
         }
 
         function fecharAlerta() { document.getElementById('custom-alert').style.display = 'none'; }
-        function confirmarLimpeza() { mostrarAlerta("Deseja realmente limpar todos os dados?", 'confirmar'); }
+        function confirmarLimpeza() { mostrarAlerta("Deseja realmente limpar todos os dados do inventário? Essa ação não pode ser desfeita.", 'confirmar'); }
         function executarLimpeza() {
             document.querySelectorAll('.peso').forEach(i => i.value = "");
             document.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
             document.getElementById('sys_v').value = document.getElementById('sys_0t').value = document.getElementById('sys_10t').value = "";
             document.getElementById('resp').value = "";
-            calc(); fecharAlerta();
+            calc();
+            fecharAlerta();
         }
 
         function render() {
@@ -209,7 +246,7 @@
                 const nextId = (i < itens.length - 1) ? `peso-${i+1}` : null;
                 tr.innerHTML = `
                     <td style="text-align:left;">${it.p}</td><td>${it.l}</td><td>${it.c}</td>
-                    <td><input type="number" class="peso editable" id="peso-${i}" oninput="calc()" onkeydown="handleEnter(event, ${nextId ? `'${nextId}'` : 'null'})"></td>
+                    <td><input type="number" class="peso editable" id="peso-${i}" oninput="calc()" onkeydown="handleEnter(event, ${nextId ? `'${nextId}'` : 'null'})" placeholder=""></td>
                     ${[25,50,75,100].map(v => `<td><input type="checkbox" name="m${i}" onclick="unck(this, ${i});calc()" data-type="0t" data-val="${v}" ${!isMix?'disabled':''}></td>`).join('')}
                     ${[25,50,75,100].map(v => `<td><input type="checkbox" name="m${i}" onclick="unck(this, ${i});calc()" data-type="10t" data-val="${v}" ${!isMix?'disabled':''}></td>`).join('')}
                     <td class="rv">0.0</td><td class="r0">0.0</td><td class="r10">0.0</td>
@@ -222,7 +259,7 @@
             if (event.key === "Enter") {
                 event.preventDefault();
                 if (nextId) document.getElementById(nextId).focus();
-                else { calc(); window.scrollTo({top: 0, behavior: 'smooth'}); }
+                else { calc(); const sV = document.getElementById('sys_v').value; const s0 = document.getElementById('sys_0t').value; const s10 = document.getElementById('sys_10t').value; if (!sV || !s0 || !s10) { mostrarAlerta("Contagem finalizada! Agora informe o Saldo no Sistema no topo da tabela."); window.scrollTo({top: 0, behavior: 'smooth'}); } else { mostrarAlerta("Contagem finalizada com sucesso!"); } }
             }
         }
 
@@ -230,7 +267,7 @@
             const pesoInput = document.getElementById(`peso-${index}`);
             if (el.checked && (!pesoInput.value || parseFloat(pesoInput.value) <= 0)) {
                 el.checked = false;
-                mostrarAlerta("Informe o peso primeiro!");
+                mostrarAlerta("Informe o peso encontrado neste ponto antes de selecionar a porcentagem do Mix.");
                 return;
             }
             document.getElementsByName(el.name).forEach(c => { if(c !== el) c.checked = false; }); 
@@ -278,8 +315,13 @@
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('app-content').style.display = 'block';
                 render();
-                setInterval(() => { document.getElementById('current-time').innerText = new Date().toLocaleString(); }, 1000);
-            } else { alert("Acesso Negado!"); }
+                setInterval(() => { 
+                    const now = new Date();
+                    document.getElementById('current-time').innerText = now.toLocaleDateString() + ' ' + now.toLocaleTimeString(); 
+                }, 1000);
+            } else { 
+                mostrarAlerta("Usuário ou senha incorretos."); 
+            }
         }
 
         function enviarEmail() {
@@ -288,17 +330,28 @@
             const sys0 = document.getElementById('sys_0t').value;
             const sys10 = document.getElementById('sys_10t').value;
             if (!resp) { mostrarAlerta("Preencha o seu nome no campo Responsável."); return; }
-            if (!sysV || !sys0 || !sys10) { mostrarAlerta("Preencha os três saldos do sistema."); return; }
+            if (!sysV || !sys0 || !sys10) { mostrarAlerta("Preencha os três saldos do sistema no topo da tabela."); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
+            
             const dt = document.getElementById('current-time').innerText;
-            window.location.href = `mailto:joao.pedroso@spiltag.com?subject=Inventario&body=Responsavel:${resp} - Data:${dt}`;
+            const tV = document.getElementById('tot_v').innerText;
+            const t0 = document.getElementById('tot_0t').innerText;
+            const t10 = document.getElementById('tot_10t').innerText;
+            const dV = document.getElementById('dif_v').innerText;
+            const d0 = document.getElementById('dif_0t').innerText;
+            const d10 = document.getElementById('dif_10t').innerText;
+
+            const ass = `Resumo de Inventário - ${resp}`;
+            const corpo = `Relatório de Inventário de Resinas%0D%0AData/Hora: ${dt}%0D%0AResponsável: ${resp}%0D%0A%0D%0A1. PET VIRGEM (0010006)%0D%0A- Físico: ${tV} KG%0D%0A- Sistema: ${sysV} KG%0D%0A- Diferença: ${dV} KG%0D%0A%0D%0A2. PCR 0T (0010048)%0D%0A- Físico: ${t0} KG%0D%0A- Sistema: ${sys0} KG%0D%0A- Diferença: ${d0} KG%0D%0A%0D%0A3. PCR 10T (0010030)%0D%0A- Físico: ${t10} KG%0D%0A- Sistema: ${sys10} KG%0D%0A- Diferença: ${d10} KG%0D%0A%0D%0A-------------------------------------------%0D%0AEnviado via App Inventário Spiltag.`;
+            
+            window.location.href = `mailto:joao.pedroso@spiltag.com?subject=${encodeURIComponent(ass)}&body=${corpo}`;
         }
 
-        // REGISTRO DO SERVICE WORKER (PWA)
+        // REGISTRO DO SERVICE WORKER
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/inventario-resina/sw.js')
-                .then(reg => console.log('SW registrado!'))
-                .catch(err => console.log('Erro no SW', err));
+                .then(reg => console.log('SW ok'))
+                .catch(err => console.log('SW erro', err));
             });
         }
     </script>
