@@ -34,14 +34,24 @@
         .login-box h1 { color: var(--accent); margin: 0 0 5px 0; font-size: 28px; letter-spacing: 2px; font-weight: bold; }
         .login-box p { font-size: 12px; color: #666; margin-bottom: 20px; font-weight: bold; }
         
+        .password-container { position: relative; width: 100%; }
+        
         .login-box input {
             width: 100% !important; padding: 12px !important; margin: 10px 0 !important; 
             border: 1px solid #aaa !important; border-radius: 6px !important; 
             box-sizing: border-box !important; font-size: 16px !important;
             background-color: #ffffff !important; display: block !important;
-            outline: none !important;
+            outline: none !important; text-align: center;
         }
         
+        .toggle-password {
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            cursor: pointer; width: 22px; height: 22px; opacity: 0.5;
+            z-index: 10; user-select: none;
+            background-repeat: no-repeat; background-position: center; background-size: contain;
+        }
+        .toggle-password:hover { opacity: 0.8; }
+
         .btn-login {
             width: 100%; padding: 14px; background-color: var(--accent);
             color: white; border: none; border-radius: 6px; cursor: pointer;
@@ -65,7 +75,6 @@
         input[type="number"], input[type="text"] { width: 95%; border: none; text-align: center; background: transparent; font-size: 13px; font-weight: bold; }
         .res-val { font-weight: bold; font-size: 14px; }
 
-        /* MODAL DE AVISO PERSONALIZADO */
         #custom-alert {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center;
@@ -82,7 +91,6 @@
         .btn-alert-ok { background: var(--accent); color: white; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 15px; }
         .btn-alert-cancel { background: var(--btn-grey); color: white; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 15px; }
 
-        /* ESTILOS DE LOGO E CÓDIGOS */
         .logo-text { font-weight: bold; font-size: 30px !important; color: var(--accent) !important; }
         .sub-cod { font-size: 10px !important; font-weight: normal !important; color: #ddd !important; display: block; }
 
@@ -114,7 +122,10 @@
             <h1>SPILTAG</h1>
             <p>INVENTÁRIO DE RESINAS</p>
             <input type="text" id="user_in" placeholder="Usuário" autocomplete="off">
-            <input type="password" id="pass_in" placeholder="Senha">
+            <div class="password-container">
+                <input type="password" id="pass_in" placeholder="Senha">
+                <span class="toggle-password" onclick="toggleSenha()" id="eye-icon"></span>
+            </div>
             <button class="btn-login" onclick="validarAcesso()">ENTRAR NO SISTEMA</button>
         </div>
     </div>
@@ -181,6 +192,26 @@
     </div>
 
     <script>
+        const iconeAberto = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23666' viewBox='0 0 24 24'%3%3Cpath d='M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z'/%3E%3C/svg%3E";
+        const iconeFechado = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23666' viewBox='0 0 24 24'%3%3Cpath d='M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.44-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.01-.16c0-1.66-1.34-3-3-3l-.16.01z'/%3E%3C/svg%3E";
+
+        function toggleSenha() {
+            const input = document.getElementById('pass_in');
+            const eye = document.getElementById('eye-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                eye.style.backgroundImage = `url("${iconeAberto}")`;
+            } else {
+                input.type = 'password';
+                eye.style.backgroundImage = `url("${iconeFechado}")`;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const eye = document.getElementById('eye-icon');
+            if(eye) eye.style.backgroundImage = `url("${iconeFechado}")`;
+        });
+
         const itens = [
             {p: "Bag suspenso A + caixa", l: "Abastecimento", c: "1575", type: "PET"},
             {p: "Bag suspenso B + caixa", l: "Abastecimento", c: "1575", type: "PET"},
@@ -331,10 +362,14 @@
             const sysV = document.getElementById('sys_v').value;
             const sys0 = document.getElementById('sys_0t').value;
             const sys10 = document.getElementById('sys_10t').value;
+
             if (!resp) { mostrarAlerta("Preencha o seu nome no campo Responsável."); return; }
             if (!sysV || !sys0 || !sys10) { mostrarAlerta("Preencha os três saldos do sistema no topo da tabela."); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
-            let fP = false; document.querySelectorAll('.peso').forEach(i => { if (i.value === "") fP = true; });
+
+            let fP = false; 
+            document.querySelectorAll('.peso').forEach(i => { if (i.value === "") fP = true; });
             if (fP) { mostrarAlerta("Existem pontos de contagem sem peso informado na tabela."); return; }
+
             const dt = document.getElementById('current-time').innerText;
             const tV = document.getElementById('tot_v').innerText;
             const t0 = document.getElementById('tot_0t').innerText;
@@ -342,8 +377,33 @@
             const dV = document.getElementById('dif_v').innerText;
             const d0 = document.getElementById('dif_0t').innerText;
             const d10 = document.getElementById('dif_10t').innerText;
+
+            let detalhamento = "%0D%0ADETALHAMENTO POR PONTO:%0D%0A";
+            document.querySelectorAll('#table-body tr').forEach((tr, i) => {
+                const pesoDigitado = tr.querySelector('.peso').value;
+                const nomePonto = itens[i].p;
+                const localPonto = itens[i].l;
+                const chk = tr.querySelector('input:checked');
+                
+                let infoMix = "";
+                if (itens[i].type === "PET") infoMix = "PET VIRGEM";
+                else if (itens[i].type === "0T") infoMix = "PCR 0T";
+                else if (itens[i].type === "10T") infoMix = "PCR 10T";
+                else if (itens[i].type === "MIX") {
+                    if (chk) {
+                        const perc = chk.dataset.val;
+                        const tipoMix = chk.dataset.type === '0t' ? '0T' : '10T';
+                        infoMix = `MIX (${perc}% ${tipoMix} / ${100-perc}% PET)`;
+                    } else {
+                        infoMix = "100% PET (Sem Mix selecionado)";
+                    }
+                }
+                detalhamento += `- ${nomePonto} (${localPonto}): ${pesoDigitado} KG -> ${infoMix}%0D%0A`;
+            });
+
             const ass = `Resumo de Inventário - ${resp}`;
-            const corpo = `Relatório de Inventário de Resinas%0D%0AData/Hora: ${dt}%0D%0AResponsável: ${resp}%0D%0A%0D%0A1. PET VIRGEM (0010006)%0D%0A- Físico: ${tV} KG%0D%0A- Sistema: ${sysV} KG%0D%0A- Diferença: ${dV} KG%0D%0A%0D%0A2. PCR 0T (0010048)%0D%0A- Físico: ${t0} KG%0D%0A- Sistema: ${sys0} KG%0D%0A- Diferença: ${d0} KG%0D%0A%0D%0A3. PCR 10T (0010030)%0D%0A- Físico: ${t10} KG%0D%0A- Sistema: ${sys10} KG%0D%0A- Diferença: ${d10} KG%0D%0A%0D%0A-------------------------------------------%0D%0AEnviado via App Inventário Spiltag.`;
+            const corpo = `RELATÓRIO DE INVENTÁRIO DE RESINAS%0D%0AData/Hora: ${dt}%0D%0AResponsável: ${resp}%0D%0A%0D%0A--- RESUMO GERAL ---%0D%0A1. PET VIRGEM (0010006)%0D%0A- Físico: ${tV} KG%0D%0A- Sistema: ${sysV} KG%0D%0A- Diferença: ${dV} KG%0D%0A%0D%0A2. PCR 0T (0010048)%0D%0A- Físico: ${t0} KG%0D%0A- Sistema: ${sys0} KG%0D%0A- Diferença: ${d0} KG%0D%0A%0D%0A3. PCR 10T (0010030)%0D%0A- Físico: ${t10} KG%0D%0A- Sistema: ${sys10} KG%0D%0A- Diferença: ${d10} KG%0D%0A%0D%0A-------------------------------------------%0D%0A${detalhamento}%0D%0A-------------------------------------------%0D%0AEnviado via App Inventário Spiltag.`;
+
             window.location.href = `mailto:joao.pedroso@spiltag.com?subject=${encodeURIComponent(ass)}&body=${corpo}`;
         }
     </script>
