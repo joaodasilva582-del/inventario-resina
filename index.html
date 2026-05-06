@@ -404,7 +404,7 @@
             const ass = `Resumo de Inventário - ${resp}`;
             const corpo = `RELATÓRIO DE INVENTÁRIO DE RESINAS%0D%0AData/Hora: ${dt}%0D%0AResponsável: ${resp}%0D%0A%0D%0A--- RESUMO GERAL ---%0D%0A1. PET VIRGEM (0010006)%0D%0A- Físico: ${tV} KG%0D%0A- Sistema: ${sysV} KG%0D%0A- Diferença: ${dV} KG%0D%0A%0D%0A2. PCR 0T (0010048)%0D%0A- Físico: ${t0} KG%0D%0A- Sistema: ${sys0} KG%0D%0A- Diferença: ${d0} KG%0D%0A%0D%0A3. PCR 10T (0010030)%0D%0A- Físico: ${t10} KG%0D%0A- Sistema: ${sys10} KG%0D%0A- Diferença: ${d10} KG%0D%0A%0D%0A-------------------------------------------%0D%0A${detalhamento}%0D%0A-------------------------------------------%0D%0AEnviado via App Inventário Spiltag.`;
 
-            window.location.href = `mailto:joao.pedroso@spiltag.com?subject=${encodeURIComponent(ass)}&body=${corpo}`;
+            window.location.href = `mailto:joao.pedroso@spiltag.com?cc=quenia.oliveira@spiltag.com&subject=${encodeURIComponent(ass)}&body=${corpo}`;
         }
     </script>
 </body>
