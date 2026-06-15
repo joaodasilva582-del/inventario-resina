@@ -493,7 +493,7 @@
                 detalhePontos += "(Nenhum peso foi informado nos pontos de contagem)%0D%0A";
             }
 
-            const ass = `Inventário de Resinas Expandido - ${resp}`;
+            const ass = `Inventário de Resinas - ${resp}`;
             const corpo = `RELATÓRIO DE INVENTÁRIO DE RESINAS%0D%0AData/Hora: ${dt}%0D%0AResponsável: ${resp}%0D%0A%0D%0A--- BALANÇO DE SALDOS COMPLETO ---%0D%0A` +
                 `1. PET VIRGEM (0010006) -> Contagem: ${tV} KG | Saldo Sistema: ${sysV} KG | Diferença: ${dV} KG%0D%0A` +
                 `2. PCR 0T (0010048)     -> Contagem: ${t0} KG | Saldo Sistema: ${sys0} KG | Diferença: ${d0} KG%0D%0A` +
@@ -502,7 +502,7 @@
                 `5. VALGROUP (0010066)   -> Contagem: ${tGlo} KG | Saldo Sistema: ${sysGlo} KG | Diferença: ${dGlo} KG%0D%0A` +
                 `6. PCR GLOBAL (0010080) -> Contagem: ${tVal} KG | Saldo Sistema: ${sysVal} KG | Diferença: ${dVal} KG%0D%0A%0D%0A` +
                 detalhePontos +
-                `-------------------------------------------%0D%0AEnviado via App Inventário Spiltag (Ambiente de Testes).`;
+                `-------------------------------------------%0D%0AEnviado via App Inventário Spiltag.`;
 
             window.location.href = `mailto:joao.pedroso@spiltag.com?cc=quenia.oliveira@spiltag.com&subject=${encodeURIComponent(ass)}&body=${corpo}`;
         }
