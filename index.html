@@ -10,6 +10,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link class="apple-touch-icon" href="icon-192.png">
     <meta name="theme-color" content="#a51c30">
+
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js');
@@ -17,200 +18,810 @@
     </script>
     
     <style>
-        :root { --border: #000; --header-bg: #e9e9e9; --accent: #a51c30; --btn-grey: #666666; --btn-blue: #0056b3; }
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+        :root {
+            --border: #000;
+            --header-bg: #e9e9e9;
+            --accent: #a51c30;
+            --btn-grey: #666666;
+            --btn-blue: #0056b3;
+        }
 
-        /* TELA DE LOGIN */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        /* =========================
+           TELA DE LOGIN
+        ========================= */
         #login-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #f4f4f4; display: flex; align-items: center; justify-content: center; z-index: 9999;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f4f4f4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
         }
-        .login-box {
-            background: white; padding: 40px; border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 90%; max-width: 380px;
-            text-align: center; border-top: 6px solid var(--accent);
-        }
-        .login-box h1 { color: var(--accent); margin: 0 0 10px 0; font-size: 32px; letter-spacing: 2px; font-weight: bold; }
-        .login-box p { font-size: 16px; color: #333; margin-bottom: 30px; font-weight: bold; text-transform: uppercase; }
-        
-        .login-box input {
-            width: 100%; padding: 14px; margin: 10px 0; 
-            border: 1px solid #ccc; border-radius: 6px; 
-            box-sizing: border-box; font-size: 16px;
-            background-color: #fff; text-align: center;
-        }
-        .login-box input::placeholder { color: #888; font-weight: normal; opacity: 1; }
 
-        .btn-login {
-            width: 100%; padding: 14px; background-color: var(--accent);
-            color: white; border: none; border-radius: 6px; cursor: pointer;
-            font-weight: bold; font-size: 16px; margin-top: 20px;
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+            border-top: 6px solid var(--accent);
+        }
+
+        .login-box h1 {
+            color: var(--accent);
+            margin: 0 0 10px 0;
+            font-size: 32px;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        .login-box p {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: bold;
             text-transform: uppercase;
         }
 
-        /* CONTEÚDO PRINCIPAL */
-        #app-content { display: none; padding: 5px; background-color: #fff; }
+        .login-box input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+            background-color: #fff;
+            text-align: center;
+        }
 
-        .no-print { margin-bottom: 10px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; padding: 10px; }
-        .btn-pdf { padding: 10px 18px; cursor: pointer; border: 1px solid #000; background-color: var(--accent); color: white; font-weight: bold; border-radius: 4px; }
-        .btn-clear { padding: 10px 18px; cursor: pointer; border: 1px solid #000; background-color: var(--btn-grey); color: white; font-weight: bold; border-radius: 4px; }
-        .btn-email { padding: 10px 18px; cursor: pointer; border: 1px solid #000; background-color: var(--btn-blue); color: white; font-weight: bold; border-radius: 4px; }
-        
-        .container { width: 100%; overflow-x: auto; }
-        table { border-collapse: collapse; width: 100%; min-width: 1250px; table-layout: fixed; } 
-        th, td { border: 1px solid var(--border); padding: 5px 2px; text-align: center; word-wrap: break-word; font-size: 12px; }
-        .bg-grey { background-color: var(--header-bg); font-weight: bold; }
-        .bg-spiltag { background-color: var(--accent); color: white; font-weight: bold; }
-        .editable { background-color: #fffdec; border: 1px solid #ccc !important; }
-        
-        input[type="number"], input[type="text"].table-input { width: 95%; border: none; text-align: center; background: transparent; font-size: 13px; font-weight: bold; }
-        select.select-resina { width: 98%; font-size: 11px; font-weight: bold; padding: 2px; border: 1px solid #bbb; border-radius: 4px; }
+        .login-box input::placeholder {
+            color: #888;
+            font-weight: normal;
+            opacity: 1;
+        }
 
-        .logo-box { color: var(--accent); font-size: 30px; font-weight: bold; letter-spacing: 2px; }
-        /* CSS AJUSTADO PARA O ICONE NA TABELA */
-        .img-logo-tabela { max-width: 90px; max-height: 90px; object-fit: contain; display: block; margin: 0 auto; }
-        
-        .resp-label { background-color: var(--accent); color: white; font-weight: bold; padding: 8px; font-size: 14px; }
-        .res-val { font-weight: bold; font-size: 13px; }
-        .sub-cod { font-size: 9px !important; font-weight: normal !important; color: #ddd !important; display: block; }
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: 20px;
+            text-transform: uppercase;
+        }
 
+        /* =========================
+           CONTEÚDO PRINCIPAL
+        ========================= */
+        #app-content {
+            display: none;
+            padding: 5px;
+            background-color: #fff;
+        }
+
+        .no-print {
+            margin-bottom: 10px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .btn-pdf {
+            padding: 10px 18px;
+            cursor: pointer;
+            border: 1px solid #000;
+            background-color: var(--accent);
+            color: white;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        .btn-clear {
+            padding: 10px 18px;
+            cursor: pointer;
+            border: 1px solid #000;
+            background-color: var(--btn-grey);
+            color: white;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        .btn-email {
+            padding: 10px 18px;
+            cursor: pointer;
+            border: 1px solid #000;
+            background-color: var(--btn-blue);
+            color: white;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        .container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 1250px;
+            table-layout: fixed;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 5px 2px;
+            text-align: center;
+            word-wrap: break-word;
+            font-size: 12px;
+        }
+
+        .bg-grey {
+            background-color: var(--header-bg);
+            font-weight: bold;
+        }
+
+        .bg-spiltag {
+            background-color: var(--accent);
+            color: white;
+            font-weight: bold;
+        }
+
+        .editable {
+            background-color: #fffdec;
+            border: 1px solid #ccc !important;
+        }
+
+        input[type="number"],
+        input[type="text"].table-input {
+            width: 95%;
+            border: none;
+            text-align: center;
+            background: transparent;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        select.select-resina {
+            width: 98%;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px;
+            border: 1px solid #bbb;
+            border-radius: 4px;
+        }
+
+        .logo-box {
+            color: var(--accent);
+            font-size: 30px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .img-logo-tabela {
+            max-width: 90px;
+            max-height: 90px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .resp-label {
+            background-color: var(--accent);
+            color: white;
+            font-weight: bold;
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        .res-val {
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .sub-cod {
+            font-size: 9px !important;
+            font-weight: normal !important;
+            color: #ddd !important;
+            display: block;
+        }
+
+        /* =========================
+           ALERTA PERSONALIZADO
+        ========================= */
         #custom-alert {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center;
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
         }
-        .alert-content {
-            background: white; padding: 25px; border-radius: 10px; text-align: center;
-            max-width: 400px; width: 85%; border-top: 8px solid var(--accent);
-        }
-        .btn-alert-ok { background: var(--accent); color: white; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; }
 
+        .alert-content {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 400px;
+            width: 85%;
+            border-top: 8px solid var(--accent);
+            box-sizing: border-box;
+        }
+
+        .alert-content h2 {
+            margin-top: 0;
+            color: var(--accent);
+        }
+
+        .alert-content p {
+            white-space: pre-line;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .btn-alert-ok {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* =========================
+           IMPRESSÃO
+        ========================= */
         @media print {
-            .no-print, #login-screen, #custom-alert { display: none !important; }
-            body { zoom: 70%; } 
-            table { width: 100% !important; table-layout: fixed !important; }
-            .bg-spiltag { background-color: var(--accent) !important; color: white !important; -webkit-print-color-adjust: exact; }
-            .bg-grey { background-color: var(--header-bg) !important; -webkit-print-color-adjust: exact; }
+            .no-print,
+            #login-screen,
+            #custom-alert {
+                display: none !important;
+            }
+
+            body {
+                zoom: 70%;
+            }
+
+            table {
+                width: 100% !important;
+                table-layout: fixed !important;
+            }
+
+            .bg-spiltag {
+                background-color: var(--accent) !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+            }
+
+            .bg-grey {
+                background-color: var(--header-bg) !important;
+                -webkit-print-color-adjust: exact;
+            }
         }
     </style>
 </head>
+
 <body>
 
+    <!-- =========================
+         ALERTA
+    ========================= -->
     <div id="custom-alert">
         <div class="alert-content">
-            <h2 id="alert-title">Atenção!</h2>
+            <h2 id="alert-title">ATENÇÃO!</h2>
             <p id="alert-msg"></p>
             <div id="alert-btns"></div>
         </div>
     </div>
 
+    <!-- =========================
+         LOGIN
+    ========================= -->
     <div id="login-screen">
         <div class="login-box">
             <h1>SPILTAG</h1>
-            <p>INVENTÁRIO DE RESINAS</p> 
-            <input type="text" id="user_in" placeholder="Usuário">
-            <input type="password" id="pass_in" placeholder="Senha">
-            <button class="btn-login" onclick="validarAcesso()">ENTRAR NO SISTEMA</button>
+            <p>INVENTÁRIO DE RESINAS</p>
+
+            <input
+                type="text"
+                id="user_in"
+                placeholder="Usuário"
+            >
+
+            <input
+                type="password"
+                id="pass_in"
+                placeholder="Senha"
+            >
+
+            <button
+                class="btn-login"
+                onclick="validarAcesso()"
+            >
+                ENTRAR NO SISTEMA
+            </button>
         </div>
     </div>
 
+    <!-- =========================
+         APP
+    ========================= -->
     <div id="app-content">
+
         <div class="no-print">
-            <button class="btn-pdf" onclick="window.print()">IMPRIMIR PDF</button>
-            <button class="btn-email" onclick="enviarEmail()">ENVIAR RELATÓRIO</button>
-            <button class="btn-clear" onclick="confirmarLimpeza()">LIMPAR TUDO</button>
+
+            <button
+                class="btn-pdf"
+                onclick="window.print()"
+            >
+                IMPRIMIR PDF
+            </button>
+
+            <button
+                class="btn-email"
+                onclick="enviarEmail()"
+            >
+                ENVIAR RELATÓRIO
+            </button>
+
+            <button
+                class="btn-clear"
+                onclick="confirmarLimpeza()"
+            >
+                LIMPAR TUDO
+            </button>
+
         </div>
 
         <div class="container">
+
             <table>
+
                 <colgroup>
-                    <col style="width: 14%;"> <col style="width: 10%;"> <col style="width: 5%;">  <col style="width: 7%;">  <col style="width: 16%;"> <col style="width: 3.5%;"><col style="width: 3.5%;"><col style="width: 3.5%;"><col style="width: 3.5%;"> <col style="width: 6.8%;"><col style="width: 6.8%;"><col style="width: 6.8%;"><col style="width: 6.8%;"><col style="width: 6.8%;"><col style="width: 6.8%;"> </colgroup>
-                
+                    <col style="width: 14%;">
+                    <col style="width: 10%;">
+                    <col style="width: 5%;">
+                    <col style="width: 7%;">
+                    <col style="width: 16%;">
+                    <col style="width: 3.5%;">
+                    <col style="width: 3.5%;">
+                    <col style="width: 3.5%;">
+                    <col style="width: 3.5%;">
+                    <col style="width: 6.8%;">
+                    <col style="width: 6.8%;">
+                    <col style="width: 6.8%;">
+                    <col style="width: 6.8%;">
+                    <col style="width: 6.8%;">
+                    <col style="width: 6.8%;">
+                </colgroup>
+
+                <!-- =========================
+                     CABEÇALHO
+                ========================= -->
                 <tr>
-                    <td rowspan="4" style="background-color: #fff;"><img src="icon-192.png" alt="Spiltag" class="img-logo-tabela"></td>
-                    <td colspan="4" id="current-time" style="font-weight: bold; border-bottom: none;">--/--/---- --:--:--</td>
-                    <td class="bg-spiltag" colspan="4">SALDO</td>
-                    <td class="bg-spiltag">PET VIRGEM<span class="sub-cod">(0010006)</span></td>
-                    <td class="bg-spiltag">PCR 0T<span class="sub-cod">(0010048)</span></td>
-                    <td class="bg-spiltag">PCR 10T<span class="sub-cod">(0010030)</span></td>
-                    <td class="bg-spiltag">ACQUAMIX<span class="sub-cod">(0010023)</span></td>
-                    <td class="bg-spiltag">VALGROUP<span class="sub-cod">(0010066)</span></td>
-                    <td class="bg-spiltag">PCR GLOBAL<span class="sub-cod">(0010080)</span></td>
-                </tr>
-                
-                <tr>
-                    <td colspan="4" class="resp-label">RESPONSÁVEL</td>
-                    <td class="bg-spiltag" colspan="4">SISTEMA</td>
-                    <td><input type="number" id="sys_v" class="editable res-val" oninput="calc()"></td>
-                    <td><input type="number" id="sys_0t" class="editable res-val" oninput="calc()"></td>
-                    <td><input type="number" id="sys_10t" class="editable res-val" oninput="calc()"></td>
-                    <td><input type="number" id="sys_acq" class="editable res-val" oninput="calc()"></td>
-                    <td><input type="number" id="sys_glo" class="editable res-val" oninput="calc()"></td>
-                    <td><input type="number" id="sys_val" class="editable res-val" oninput="calc()"></td>
-                </tr>
-                
-                <tr>
-                    <td colspan="4" rowspan="2" style="padding: 10px;">
-                        <input type="text" id="resp" class="editable table-input" placeholder="Nome Completo" style="font-size: 16px; width: 90%;">
+
+                    <td
+                        rowspan="4"
+                        style="background-color: #fff;"
+                    >
+                        <img
+                            src="icon-192.png"
+                            alt="Spiltag"
+                            class="img-logo-tabela"
+                        >
                     </td>
-                    <td class="bg-spiltag" colspan="4">SOMA</td>
-                    <td id="som_v" class="res-val">0.0</td>
-                    <td id="som_0t" class="res-val">0.0</td>
-                    <td id="som_10t" class="res-val">0.0</td>
-                    <td id="som_acq" class="res-val">0.0</td>
-                    <td id="som_glo" class="res-val">0.0</td>
-                    <td id="som_val" class="res-val">0.0</td>
-                </tr>
-                
-                <tr>
-                    <td class="bg-spiltag" colspan="4">DIFERENÇA</td>
-                    <td id="dif_v" class="res-val">0.0</td>
-                    <td id="dif_0t" class="res-val">0.0</td>
-                    <td id="dif_10t" class="res-val">0.0</td>
-                    <td id="dif_acq" class="res-val">0.0</td>
-                    <td id="dif_glo" class="res-val">0.0</td>
-                    <td id="dif_val" class="res-val">0.0</td>
+
+                    <td
+                        colspan="4"
+                        id="current-time"
+                        style="font-weight: bold; border-bottom: none;"
+                    >
+                        --/--/---- --:--:--
+                    </td>
+
+                    <td
+                        class="bg-spiltag"
+                        colspan="4"
+                    >
+                        SALDO
+                    </td>
+
+                    <td class="bg-spiltag">
+                        PET VIRGEM
+                        <span class="sub-cod">(0010006)</span>
+                    </td>
+
+                    <td class="bg-spiltag">
+                        PCR 0T
+                        <span class="sub-cod">(0010048)</span>
+                    </td>
+
+                    <td class="bg-spiltag">
+                        PCR 10T
+                        <span class="sub-cod">(0010030)</span>
+                    </td>
+
+                    <td class="bg-spiltag">
+                        ACQUAMIX
+                        <span class="sub-cod">(0010023)</span>
+                    </td>
+
+                    <td class="bg-spiltag">
+                        VALGROUP
+                        <span class="sub-cod">(0010066)</span>
+                    </td>
+
+                    <td class="bg-spiltag">
+                        PCR GLOBAL
+                        <span class="sub-cod">(0010080)</span>
+                    </td>
+
                 </tr>
 
+                <!-- =========================
+                     SISTEMA
+                ========================= -->
+                <tr>
+
+                    <td
+                        colspan="4"
+                        class="resp-label"
+                    >
+                        RESPONSÁVEL
+                    </td>
+
+                    <td
+                        class="bg-spiltag"
+                        colspan="4"
+                    >
+                        SISTEMA
+                    </td>
+
+                    <td>
+                        <input
+                            type="number"
+                            id="sys_v"
+                            class="editable res-val"
+                            oninput="calc()"
+                        >
+                    </td>
+
+                    <td>
+                        <input
+                            type="number"
+                            id="sys_0t"
+                            class="editable res-val"
+                            oninput="calc()"
+                        >
+                    </td>
+
+                    <td>
+                        <input
+                            type="number"
+                            id="sys_10t"
+                            class="editable res-val"
+                            oninput="calc()"
+                        >
+                    </td>
+
+                    <td>
+                        <input
+                            type="number"
+                            id="sys_acq"
+                            class="editable res-val"
+                            oninput="calc()"
+                        >
+                    </td>
+
+                    <td>
+                        <input
+                            type="number"
+                            id="sys_glo"
+                            class="editable res-val"
+                            oninput="calc()"
+                        >
+                    </td>
+
+                    <td>
+                        <input
+                            type="number"
+                            id="sys_val"
+                            class="editable res-val"
+                            oninput="calc()"
+                        >
+                    </td>
+
+                </tr>
+
+                <!-- =========================
+                     RESPONSÁVEL / SOMA
+                ========================= -->
+                <tr>
+
+                    <td
+                        colspan="4"
+                        rowspan="2"
+                        style="padding: 10px;"
+                    >
+                        <input
+                            type="text"
+                            id="resp"
+                            class="editable table-input"
+                            placeholder="Nome Completo"
+                            style="font-size: 16px; width: 90%;"
+                        >
+                    </td>
+
+                    <td
+                        class="bg-spiltag"
+                        colspan="4"
+                    >
+                        SOMA
+                    </td>
+
+                    <td
+                        id="som_v"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="som_0t"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="som_10t"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="som_acq"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="som_glo"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="som_val"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                </tr>
+
+                <!-- =========================
+                     DIFERENÇA
+                ========================= -->
+                <tr>
+
+                    <td
+                        class="bg-spiltag"
+                        colspan="4"
+                    >
+                        DIFERENÇA
+                    </td>
+
+                    <td
+                        id="dif_v"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="dif_0t"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="dif_10t"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="dif_acq"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="dif_glo"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="dif_val"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                </tr>
+
+                <!-- =========================
+                     CABEÇALHO DA TABELA
+                ========================= -->
                 <tr class="bg-grey">
-                    <th rowspan="2">Ponto de Contagem</th>
-                    <th rowspan="2">Localização</th>
-                    <th rowspan="2">Cap.</th>
-                    <th rowspan="2">Peso (KG)</th>
-                    <th rowspan="2">Configuração da Carga / Resina Base</th>
-                    <th colspan="4">Proporção do Mix Selecionado</th>
-                    <th colspan="6">Distribuição Líquida Calculada (KG)</th>
+
+                    <th rowspan="2">
+                        Ponto de Contagem
+                    </th>
+
+                    <th rowspan="2">
+                        Localização
+                    </th>
+
+                    <th rowspan="2">
+                        Cap.
+                    </th>
+
+                    <th rowspan="2">
+                        Peso (KG)
+                    </th>
+
+                    <th rowspan="2">
+                        Configuração da Carga / Resina Base
+                    </th>
+
+                    <th colspan="4">
+                        Proporção do Mix Selecionado
+                    </th>
+
+                    <th colspan="6">
+                        Distribuição Líquida Calculada (KG)
+                    </th>
+
                 </tr>
-                <tr class="bg-grey" style="font-size: 11px;">
-                    <th>25%</th><th>50%</th><th>75%</th><th>100%</th>
-                    <th>PET VIRGEM</th><th>PCR 0T</th><th>PCR 10T</th><th>ACQUAMIX</th><th>VALGROUP</th><th>PCR GLOBAL</th>
+
+                <tr
+                    class="bg-grey"
+                    style="font-size: 11px;"
+                >
+
+                    <th>25%</th>
+                    <th>50%</th>
+                    <th>75%</th>
+                    <th>100%</th>
+
+                    <th>PET VIRGEM</th>
+                    <th>PCR 0T</th>
+                    <th>PCR 10T</th>
+                    <th>ACQUAMIX</th>
+                    <th>VALGROUP</th>
+                    <th>PCR GLOBAL</th>
+
                 </tr>
-                
+
                 <tbody id="table-body"></tbody>
-                
+
+                <!-- =========================
+                     TOTAL
+                ========================= -->
                 <tr class="bg-grey">
-                    <td colspan="9" style="text-align:right; font-weight:bold;">SOMA TOTAL FÍSICA:</td>
-                    <td id="tot_v" class="res-val">0.0</td>
-                    <td id="tot_0t" class="res-val">0.0</td>
-                    <td id="tot_10t" class="res-val">0.0</td>
-                    <td id="tot_acq" class="res-val">0.0</td>
-                    <td id="tot_glo" class="res-val">0.0</td>
-                    <td id="tot_val" class="res-val">0.0</td>
+
+                    <td
+                        colspan="9"
+                        style="text-align:right; font-weight:bold;"
+                    >
+                        SOMA TOTAL FÍSICA:
+                    </td>
+
+                    <td
+                        id="tot_v"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="tot_0t"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="tot_10t"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="tot_acq"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="tot_glo"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="tot_val"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
                 </tr>
+
             </table>
+
         </div>
+
     </div>
 
     <script>
+
+        /* ============================================================
+           PONTOS DE CONTAGEM
+        ============================================================ */
+
         const itens = [
+
             {p: "Bag suspenso A + caixa", l: "Abastecimento", c: "1575", type: "PET"},
             {p: "Bag suspenso B + caixa", l: "Abastecimento", c: "1575", type: "PET"},
             {p: "Bag suspenso C + caixa", l: "Abastecimento", c: "1575", type: "PET"},
             {p: "Bag suspenso D + caixa", l: "Abastecimento", c: "1575", type: "PET"},
+
             {p: "Desumid. 01", l: "Sopro", c: "240", type: "PET"},
             {p: "Desumid. 02", l: "Sopro", c: "480", type: "PET"},
             {p: "Desumid. 03", l: "Sopro", c: "160", type: "PET"},
             {p: "Desumid. 04", l: "Sopro", c: "320", type: "PET"},
             {p: "Desumid. 05", l: "Sopro", c: "320", type: "PET"},
+
             {p: "Desumid. 06", l: "Sopro", c: "160", type: "MIX"},
             {p: "Desumid. 07", l: "Sopro", c: "160", type: "MIX"},
             {p: "Desumid. 08", l: "Sopro", c: "160", type: "MIX"},
@@ -224,122 +835,435 @@
             {p: "Desumid. 17", l: "Sopro", c: "240", type: "PET"},
             {p: "Desumid. 18", l: "Sopro", c: "480", type: "PET"},
             {p: "Desumid. 19", l: "Sopro", c: "500", type: "PET"},
+
             {p: "Caçamba 01", l: "Sopro", c: "Pesag.", type: "MIX"},
             {p: "Caçamba 02", l: "Sopro", c: "Pesag.", type: "MIX"},
             {p: "Caçamba 03", l: "Sopro", c: "Pesag.", type: "MIX"},
             {p: "Caçamba 04", l: "Sopro", c: "Pesag.", type: "MIX"},
             {p: "Caçamba 05", l: "Sopro", c: "Pesag.", type: "MIX"},
             {p: "Caçamba 06", l: "Sopro", c: "Pesag.", type: "MIX"},
+
             {p: "Bags PET VI 0,80", l: "Sopro", c: "Pesag.", type: "PET"},
             {p: "Bags PCR 0T", l: "Sopro", c: "Pesag.", type: "0T"},
             {p: "Bags PCR 10T", l: "Sopro", c: "Pesag.", type: "10T"},
-            {p: "Bags PET ACQUAMIX", l: "Sopro", c: "Pesag.", type: "ACQ"},  
-            {p: "Bags VALGROUP PCR", l: "Sopro", c: "Pesag.", type: "VAL"}, 
-            {p: "Bags GLOBAL PET PCR", l: "Sopro", c: "Pesag.", type: "GLO"},  
+            {p: "Bags PET ACQUAMIX", l: "Sopro", c: "Pesag.", type: "ACQ"},
+            {p: "Bags VALGROUP PCR", l: "Sopro", c: "Pesag.", type: "VAL"},
+            {p: "Bags GLOBAL PET PCR", l: "Sopro", c: "Pesag.", type: "GLO"},
+
             {p: "Desumid. 15", l: "Dinamo", c: "240", type: "MIX"},
             {p: "Bags avulsos (Dinamo)", l: "Dinamo", c: "Pesag.", type: "MIX"}
+
         ];
 
+
+        /* ============================================================
+           RENDERIZA TABELA
+        ============================================================ */
+
         function render() {
+
             const body = document.getElementById('table-body');
+
             body.innerHTML = "";
+
             itens.forEach((it, i) => {
+
                 const tr = document.createElement('tr');
+
                 const isMix = it.type === "MIX";
-                
+
                 let seletorHtml = "";
+
                 if (isMix) {
+
                     seletorHtml = `
-                    <select id="sel-${i}" class="select-resina" onchange="tratarMudancaResina(this, ${i});calc()">
-                        <option value="">-- Selecione a Resina --</option>
-                        <option value="0010048">0010048 - PCR 0T</option>
-                        <option value="0010030">0010030 - PCR 10T</option>
-                        <option value="0010023">0010023 - ACQUAMIX</option>
-                        <option value="0010066">0010066 - VALGROUP</option>
-                        <option value="0010080">0010080 - PCR GLOBAL</option>
-                    </select>`;
+                        <select
+                            id="sel-${i}"
+                            class="select-resina"
+                            onchange="tratarMudancaResina(this, ${i});calc()"
+                        >
+                            <option value="">
+                                -- Selecione a Resina --
+                            </option>
+
+                            <option value="0010048">
+                                0010048 - PCR 0T
+                            </option>
+
+                            <option value="0010030">
+                                0010030 - PCR 10T
+                            </option>
+
+                            <option value="0010023">
+                                0010023 - ACQUAMIX
+                            </option>
+
+                            <option value="0010066">
+                                0010066 - VALGROUP
+                            </option>
+
+                            <option value="0010080">
+                                0010080 - PCR GLOBAL
+                            </option>
+
+                        </select>
+                    `;
+
                 } else {
+
                     let txtFixo = "";
-                    if (it.type === "PET") txtFixo = "0010006 - PET";
-                    else if (it.type === "0T") txtFixo = "0010048 - 0T";
-                    else if (it.type === "10T") txtFixo = "0010030 - 10T";
-                    else if (it.type === "ACQ") txtFixo = "0010023 - ACQ";
-                    else if (it.type === "VAL") txtFixo = "0010066 - VAL";
-                    else if (it.type === "GLO") txtFixo = "0010080 - GLO";
-                    seletorHtml = `<span style="font-size:11px; font-weight:bold;">${txtFixo}</span>`;
+
+                    if (it.type === "PET")
+                        txtFixo = "0010006 - PET";
+
+                    else if (it.type === "0T")
+                        txtFixo = "0010048 - 0T";
+
+                    else if (it.type === "10T")
+                        txtFixo = "0010030 - 10T";
+
+                    else if (it.type === "ACQ")
+                        txtFixo = "0010023 - ACQ";
+
+                    else if (it.type === "VAL")
+                        txtFixo = "0010066 - VAL";
+
+                    else if (it.type === "GLO")
+                        txtFixo = "0010080 - GLO";
+
+                    seletorHtml = `
+                        <span style="font-size:11px; font-weight:bold;">
+                            ${txtFixo}
+                        </span>
+                    `;
                 }
+
 
                 tr.innerHTML = `
-                    <td style="text-align:left; font-weight:bold;">${it.p}</td><td>${it.l}</td><td>${it.c}</td>
-                    <td><input type="number" class="peso editable" id="peso-${i}" oninput="calc()" placeholder=""></td>
-                    <td>${seletorHtml}</td>
-                    ${[25,50,75,100].map(v => `<td><input type="checkbox" name="m${i}" id="chk-${i}-${v}" onclick="unck(this, ${i});calc()" data-val="${v}" ${!isMix?'disabled':''}></td>`).join('')}
-                    <td class="rv res-val">0.0</td><td class="r0 res-val">0.0</td><td class="r10 res-val">0.0</td>
-                    <td class="racq res-val">0.0</td><td class="rglo res-val">0.0</td><td class="rval res-val">0.0</td>
+
+                    <td style="text-align:left; font-weight:bold;">
+                        ${it.p}
+                    </td>
+
+                    <td>
+                        ${it.l}
+                    </td>
+
+                    <td>
+                        ${it.c}
+                    </td>
+
+                    <td>
+                        <input
+                            type="number"
+                            class="peso editable"
+                            id="peso-${i}"
+                            oninput="calc()"
+                            placeholder=""
+                        >
+                    </td>
+
+                    <td>
+                        ${seletorHtml}
+                    </td>
+
+                    ${[25,50,75,100].map(v => `
+                        <td>
+                            <input
+                                type="checkbox"
+                                name="m${i}"
+                                id="chk-${i}-${v}"
+                                onclick="unck(this, ${i});calc()"
+                                data-val="${v}"
+                                ${!isMix ? 'disabled' : ''}
+                            >
+                        </td>
+                    `).join('')}
+
+                    <td class="rv res-val">0.0</td>
+                    <td class="r0 res-val">0.0</td>
+                    <td class="r10 res-val">0.0</td>
+                    <td class="racq res-val">0.0</td>
+                    <td class="rglo res-val">0.0</td>
+                    <td class="rval res-val">0.0</td>
+
                 `;
+
                 body.appendChild(tr);
+
             });
+
         }
+
+
+        /* ============================================================
+           MUDANÇA DE RESINA
+        ============================================================ */
 
         function tratarMudancaResina(selectEl, index) {
-            const ehAcquamix = selectEl.value === "0010023";
-            [25, 50, 75, 100].forEach(v => {
-                const chk = document.getElementById(`chk-${index}-${v}`);
-                if (chk && ehAcquamix) { chk.checked = false; chk.disabled = true; } 
-                else if (chk) { chk.disabled = false; }
+
+            const ehAcquamix =
+                selectEl.value === "0010023";
+
+            [25,50,75,100].forEach(v => {
+
+                const chk =
+                    document.getElementById(`chk-${index}-${v}`);
+
+                if (chk && ehAcquamix) {
+
+                    chk.checked = false;
+                    chk.disabled = true;
+
+                } else if (chk) {
+
+                    chk.disabled = false;
+
+                }
+
             });
+
         }
 
-        function calc() {
-            let tV = 0, t0 = 0, t10 = 0, tAcq = 0, tGlo = 0, tVal = 0;
-            document.querySelectorAll('#table-body tr').forEach((tr, i) => {
-                const p = parseFloat(tr.querySelector('.peso').value) || 0;
-                const chk = tr.querySelector('input:checked');
-                const select = tr.querySelector('.select-resina');
-                let v = 0, p0 = 0, p10 = 0, acq = 0, glo = 0, valg = 0;
 
-                if (itens[i].type === "PET") v = p;
-                else if (itens[i].type === "0T") p0 = p;
-                else if (itens[i].type === "10T") p10 = p;
-                else if (itens[i].type === "ACQ") acq = p;
-                else if (itens[i].type === "GLO") glo = p;
-                else if (itens[i].type === "VAL") valg = p;
-                else if (itens[i].type === "MIX") {
-                    if (select && !select.value) {
+        /* ============================================================
+           CÁLCULO
+        ============================================================ */
+
+        function calc() {
+
+            let tV = 0;
+            let t0 = 0;
+            let t10 = 0;
+            let tAcq = 0;
+            let tGlo = 0;
+            let tVal = 0;
+
+
+            document
+                .querySelectorAll('#table-body tr')
+                .forEach((tr, i) => {
+
+                    const p =
+                        parseFloat(
+                            tr.querySelector('.peso').value
+                        ) || 0;
+
+                    const chk =
+                        tr.querySelector('input:checked');
+
+                    const select =
+                        tr.querySelector('.select-resina');
+
+
+                    let v = 0;
+                    let p0 = 0;
+                    let p10 = 0;
+                    let acq = 0;
+                    let glo = 0;
+                    let valg = 0;
+
+
+                    if (itens[i].type === "PET") {
+
                         v = p;
+
                     }
-                    else if (select && select.value === "0010023") acq = p;
-                    else if (chk) {
-                        let fator = parseInt(chk.dataset.val) / 100;
-                        let qMix = p * fator;
-                        v = p - qMix;
-                        if (select.value === "0010048") p0 = qMix;
-                        else if (select.value === "0010030") p10 = qMix;
-                        else if (select.value === "0010066") valg = qMix;
-                        else if (select.value === "0010080") glo = qMix;
-                    } else { v = p; }
-                }
-                
-                tr.querySelector('.rv').innerText = v.toFixed(1); tr.querySelector('.r0').innerText = p0.toFixed(1);
-                tr.querySelector('.r10').innerText = p10.toFixed(1); tr.querySelector('.racq').innerText = acq.toFixed(1);
-                tr.querySelector('.rglo').innerText = valg.toFixed(1); tr.querySelector('.rval').innerText = glo.toFixed(1);
-                
-                tV += v; t0 += p0; t10 += p10; tAcq += acq; tGlo += valg; tVal += glo;
-            });
-            
-            document.getElementById('tot_v').innerText = document.getElementById('som_v').innerText = tV.toFixed(1);
-            document.getElementById('tot_0t').innerText = document.getElementById('som_0t').innerText = t0.toFixed(1);
-            document.getElementById('tot_10t').innerText = document.getElementById('som_10t').innerText = t10.toFixed(1);
-            document.getElementById('tot_acq').innerText = document.getElementById('som_acq').innerText = tAcq.toFixed(1);
-            document.getElementById('tot_glo').innerText = document.getElementById('som_glo').innerText = tGlo.toFixed(1);
-            document.getElementById('tot_val').innerText = document.getElementById('som_val').innerText = tVal.toFixed(1);
-            
-            const sysV = parseFloat(document.getElementById('sys_v').value) || 0;
-            const sys0 = parseFloat(document.getElementById('sys_0t').value) || 0;
-            const sys10 = parseFloat(document.getElementById('sys_10t').value) || 0;
-            const sysAcq = parseFloat(document.getElementById('sys_acq').value) || 0;
-            const sysGlo = parseFloat(document.getElementById('sys_glo').value) || 0;
-            const sysVal = parseFloat(document.getElementById('sys_val').value) || 0;
+
+                    else if (itens[i].type === "0T") {
+
+                        p0 = p;
+
+                    }
+
+                    else if (itens[i].type === "10T") {
+
+                        p10 = p;
+
+                    }
+
+                    else if (itens[i].type === "ACQ") {
+
+                        acq = p;
+
+                    }
+
+                    else if (itens[i].type === "GLO") {
+
+                        glo = p;
+
+                    }
+
+                    else if (itens[i].type === "VAL") {
+
+                        valg = p;
+
+                    }
+
+                    else if (itens[i].type === "MIX") {
+
+                        if (select && !select.value) {
+
+                            v = p;
+
+                        }
+
+                        else if (
+                            select &&
+                            select.value === "0010023"
+                        ) {
+
+                            acq = p;
+
+                        }
+
+                        else if (chk) {
+
+                            let fator =
+                                parseInt(chk.dataset.val) / 100;
+
+                            let qMix =
+                                p * fator;
+
+                            v =
+                                p - qMix;
+
+
+                            if (
+                                select.value === "0010048"
+                            ) {
+
+                                p0 = qMix;
+
+                            }
+
+                            else if (
+                                select.value === "0010030"
+                            ) {
+
+                                p10 = qMix;
+
+                            }
+
+                            else if (
+                                select.value === "0010066"
+                            ) {
+
+                                valg = qMix;
+
+                            }
+
+                            else if (
+                                select.value === "0010080"
+                            ) {
+
+                                glo = qMix;
+
+                            }
+
+                        }
+
+                        else {
+
+                            v = p;
+
+                        }
+
+                    }
+
+
+                    tr.querySelector('.rv').innerText =
+                        v.toFixed(1);
+
+                    tr.querySelector('.r0').innerText =
+                        p0.toFixed(1);
+
+                    tr.querySelector('.r10').innerText =
+                        p10.toFixed(1);
+
+                    tr.querySelector('.racq').innerText =
+                        acq.toFixed(1);
+
+                    tr.querySelector('.rglo').innerText =
+                        valg.toFixed(1);
+
+                    tr.querySelector('.rval').innerText =
+                        glo.toFixed(1);
+
+
+                    tV += v;
+                    t0 += p0;
+                    t10 += p10;
+                    tAcq += acq;
+                    tGlo += glo;
+                    tVal += valg;
+
+                });
+
+
+            document.getElementById('tot_v').innerText =
+                document.getElementById('som_v').innerText =
+                tV.toFixed(1);
+
+            document.getElementById('tot_0t').innerText =
+                document.getElementById('som_0t').innerText =
+                t0.toFixed(1);
+
+            document.getElementById('tot_10t').innerText =
+                document.getElementById('som_10t').innerText =
+                t10.toFixed(1);
+
+            document.getElementById('tot_acq').innerText =
+                document.getElementById('som_acq').innerText =
+                tAcq.toFixed(1);
+
+            document.getElementById('tot_glo').innerText =
+                document.getElementById('som_glo').innerText =
+                tGlo.toFixed(1);
+
+            document.getElementById('tot_val').innerText =
+                document.getElementById('som_val').innerText =
+                tVal.toFixed(1);
+
+
+            /* =========================
+               SALDOS SISTEMA
+            ========================= */
+
+            const sysV =
+                parseFloat(
+                    document.getElementById('sys_v').value
+                ) || 0;
+
+            const sys0 =
+                parseFloat(
+                    document.getElementById('sys_0t').value
+                ) || 0;
+
+            const sys10 =
+                parseFloat(
+                    document.getElementById('sys_10t').value
+                ) || 0;
+
+            const sysAcq =
+                parseFloat(
+                    document.getElementById('sys_acq').value
+                ) || 0;
+
+            const sysGlo =
+                parseFloat(
+                    document.getElementById('sys_glo').value
+                ) || 0;
+
+            const sysVal =
+                parseFloat(
+                    document.getElementById('sys_val').value
+                ) || 0;
+
+
+            /* =========================
+               DIFERENÇAS
+            ========================= */
 
             const dV = tV - sysV;
             const d0 = t0 - sys0;
@@ -348,12 +1272,25 @@
             const dGlo = tGlo - sysGlo;
             const dVal = tVal - sysVal;
 
-            const elDifV = document.getElementById('dif_v');
-            const elDif0 = document.getElementById('dif_0t');
-            const elDif10 = document.getElementById('dif_10t');
-            const elDifAcq = document.getElementById('dif_acq');
-            const elDifGlo = document.getElementById('dif_glo');
-            const elDifVal = document.getElementById('dif_val');
+
+            const elDifV =
+                document.getElementById('dif_v');
+
+            const elDif0 =
+                document.getElementById('dif_0t');
+
+            const elDif10 =
+                document.getElementById('dif_10t');
+
+            const elDifAcq =
+                document.getElementById('dif_acq');
+
+            const elDifGlo =
+                document.getElementById('dif_glo');
+
+            const elDifVal =
+                document.getElementById('dif_val');
+
 
             elDifV.innerText = dV.toFixed(1);
             elDif0.innerText = d0.toFixed(1);
@@ -362,212 +1299,767 @@
             elDifGlo.innerText = dGlo.toFixed(1);
             elDifVal.innerText = dVal.toFixed(1);
 
-            // AJUSTE 2: Formatação cirúrgica de cores nas fontes das Diferenças
+
+            /* =========================
+               CORES DAS DIFERENÇAS
+            ========================= */
+
             const listaDifs = [
-                { el: elDifV, val: dV }, { el: elDif0, val: d0 }, { el: elDif10, val: d10 },
-                { el: elDifAcq, val: dAcq }, { el: elDifGlo, val: dGlo }, { el: elDifVal, val: dVal }
+
+                { el: elDifV, val: dV },
+                { el: elDif0, val: d0 },
+                { el: elDif10, val: d10 },
+                { el: elDifAcq, val: dAcq },
+                { el: elDifGlo, val: dGlo },
+                { el: elDifVal, val: dVal }
+
             ];
 
+
             listaDifs.forEach(item => {
+
                 if (item.val < 0) {
-                    item.el.style.color = '#a51c30'; // Vermelho
-                } else if (item.val > 0) {
-                    item.el.style.color = '#28a745'; // Verde
-                } else {
-                    item.el.style.color = '';        // Padrão (Preto)
+
+                    item.el.style.color =
+                        '#a51c30';
+
                 }
+
+                else if (item.val > 0) {
+
+                    item.el.style.color =
+                        '#28a745';
+
+                }
+
+                else {
+
+                    item.el.style.color = '';
+
+                }
+
             });
+
         }
 
-        function unck(el, index) { document.getElementsByName(el.name).forEach(c => { if(c !== el) c.checked = false; }); }
+
+        /* ============================================================
+           CHECKBOX
+        ============================================================ */
+
+        function unck(el, index) {
+
+            document
+                .getElementsByName(el.name)
+                .forEach(c => {
+
+                    if (c !== el) {
+
+                        c.checked = false;
+
+                    }
+
+                });
+
+        }
+
+
+        /* ============================================================
+           LOGIN
+        ============================================================ */
 
         function validarAcesso() {
-            const u = document.getElementById('user_in').value;
-            const p = document.getElementById('pass_in').value;
-            if (u === "producao" && p === "Spil@2026") {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('app-content').style.display = 'block';
+
+            const u =
+                document.getElementById('user_in').value;
+
+            const p =
+                document.getElementById('pass_in').value;
+
+
+            if (
+                u === "producao" &&
+                p === "Spil@2026"
+            ) {
+
+                document.getElementById('login-screen')
+                    .style.display = 'none';
+
+                document.getElementById('app-content')
+                    .style.display = 'block';
+
+
                 render();
-                setInterval(() => { document.getElementById('current-time').innerText = new Date().toLocaleString(); }, 1000);
-            } else { alert("Acesso Negado!"); }
+
+
+                setInterval(() => {
+
+                    document.getElementById('current-time')
+                        .innerText =
+                        new Date().toLocaleString();
+
+                }, 1000);
+
+            }
+
+            else {
+
+                mostrarAlertaCustomizado(
+                    "Acesso Negado!"
+                );
+
+            }
+
         }
+
+
+        /* ============================================================
+           ALERTA PERSONALIZADO
+        ============================================================ */
 
         function mostrarAlertaCustomizado(msg) {
-            const modal = document.getElementById('custom-alert');
-            document.getElementById('alert-title').innerText = "ATENÇÃO!";
-            document.getElementById('alert-msg').innerText = msg;
-            document.getElementById('alert-btns').innerHTML = `<button class="btn-alert-ok" onclick="document.getElementById('custom-alert').style.display='none'">OK</button>`;
+
+            const modal =
+                document.getElementById('custom-alert');
+
+
+            document.getElementById('alert-title')
+                .innerText = "ATENÇÃO!";
+
+
+            document.getElementById('alert-msg')
+                .innerText = msg;
+
+
+            document.getElementById('alert-btns')
+                .innerHTML = `
+
+                    <button
+                        class="btn-alert-ok"
+                        onclick="
+                            document.getElementById('custom-alert').style.display='none'
+                        "
+                    >
+                        OK
+                    </button>
+
+                `;
+
+
             modal.style.display = 'flex';
+
         }
 
-        // AJUSTE 3: Limpar tudo agora apenas zera os dados locais na tela, mantendo o operador logado
+
+        /* ============================================================
+           LIMPAR TUDO
+        ============================================================ */
+
         function confirmarLimpeza() {
-            document.getElementById('alert-msg').innerText = "Deseja realmente limpar todos os dados?";
-            document.getElementById('alert-btns').innerHTML = `
-                <button onclick="limparApenasDados()" class="btn-alert-ok">SIM</button> 
-                <button onclick="document.getElementById('custom-alert').style.display='none'" style="padding:12px; border:none; border-radius:5px; cursor:pointer;">NÃO</button>
-            `;
-            document.getElementById('custom-alert').style.display = 'flex';
+
+            document.getElementById('alert-msg')
+                .innerText =
+                "Deseja realmente limpar todos os dados?";
+
+
+            document.getElementById('alert-btns')
+                .innerHTML = `
+
+                    <button
+                        onclick="limparApenasDados()"
+                        class="btn-alert-ok"
+                    >
+                        SIM
+                    </button>
+
+                    <button
+                        onclick="
+                            document.getElementById('custom-alert').style.display='none'
+                        "
+                        style="
+                            padding:12px;
+                            border:none;
+                            border-radius:5px;
+                            cursor:pointer;
+                            margin-left:5px;
+                        "
+                    >
+                        NÃO
+                    </button>
+
+                `;
+
+
+            document.getElementById('custom-alert')
+                .style.display = 'flex';
+
         }
+
 
         function limparApenasDados() {
-            // Limpa todos os inputs de peso da tabela
-            document.querySelectorAll('#table-body .peso').forEach(input => input.value = '');
-            // Limpa todos os checkboxes marcados
-            document.querySelectorAll('#table-body input[type="checkbox"]').forEach(chk => chk.checked = false);
-            // Reseta os seletores de mix para a posição inicial
-            document.querySelectorAll('#table-body .select-resina').forEach(select => select.value = '');
-            // Zera os inputs do saldo do sistema
+
+            /* Limpa pesos */
+            document
+                .querySelectorAll('#table-body .peso')
+                .forEach(input => {
+
+                    input.value = '';
+
+                });
+
+
+            /* Limpa checkboxes */
+            document
+                .querySelectorAll(
+                    '#table-body input[type="checkbox"]'
+                )
+                .forEach(chk => {
+
+                    chk.checked = false;
+
+                });
+
+
+            /* Limpa seletores */
+            document
+                .querySelectorAll(
+                    '#table-body .select-resina'
+                )
+                .forEach(select => {
+
+                    select.value = '';
+
+                    /* Reativa checkboxes do MIX */
+                    const index =
+                        select.id.split('-')[1];
+
+                    [25,50,75,100].forEach(v => {
+
+                        const chk =
+                            document.getElementById(
+                                `chk-${index}-${v}`
+                            );
+
+                        if (chk) {
+
+                            chk.disabled = false;
+
+                        }
+
+                    });
+
+                });
+
+
+            /* Limpa saldos sistema */
             document.getElementById('sys_v').value = '';
             document.getElementById('sys_0t').value = '';
             document.getElementById('sys_10t').value = '';
             document.getElementById('sys_acq').value = '';
             document.getElementById('sys_glo').value = '';
             document.getElementById('sys_val').value = '';
-            // Limpa o nome do responsável
+
+
+            /* Limpa responsável */
             document.getElementById('resp').value = '';
-            
+
+
+            /* Recalcula */
             calc();
+
+
+            /* Fecha alerta */
+            document.getElementById('custom-alert')
+                .style.display = 'none';
+
+        }
+
+
+        /* ============================================================
+           ENVIO DO E-MAIL
            
-            document.getElementById('custom-alert').style.display = 'none';
-        }
+           TRAVAS:
+           1 - Responsável obrigatório
+           2 - Todos os saldos do SISTEMA obrigatórios
+           3 - Todos os pontos de CONTAGEM obrigatórios
+           
+           IMPORTANTE:
+           O valor 0 É ACEITO.
+        ============================================================ */
 
-       function enviarEmail() {
-    const resp = document.getElementById('resp').value.trim();
+        function enviarEmail() {
 
-    if (!resp) {
-        mostrarAlertaCustomizado(
-            "Preencha o seu nome no campo RESPONSÁVEL."
-        );
-        return;
-    }
-    const camposSistema = [
-        { id: 'sys_v',   nome: 'PET VIRGEM (0010006)' },
-        { id: 'sys_0t',  nome: 'PCR 0T (0010048)' },
-        { id: 'sys_10t', nome: 'PCR 10T (0010030)' },
-        { id: 'sys_acq', nome: 'ACQUAMIX (0010023)' },
-        { id: 'sys_glo', nome: 'VALGROUP (0010066)' },
-        { id: 'sys_val', nome: 'PCR GLOBAL (0010080)' }
-    ];
+            /* ========================================================
+               1. RESPONSÁVEL
+            ======================================================== */
 
-    const camposVazios = camposSistema.filter(campo => {
-        return document.getElementById(campo.id).value.trim() === "";
-    });
+            const resp =
+                document.getElementById('resp')
+                    .value
+                    .trim();
 
-    if (camposVazios.length > 0) {
 
-        let mensagem = "Preencha os saldos na linha SISTEMA.";
+            if (!resp) {
 
-        if (camposVazios.length === 1) {
-            mensagem += `\n\nCampo pendente:\n${camposVazios[0].nome}`;
-        } else {
-            mensagem += "\n\nCampos pendentes:";
-            camposVazios.forEach(campo => {
-                mensagem += `\n• ${campo.nome}`;
-            });
-        }
+                mostrarAlertaCustomizado(
+                    "Preencha o seu nome no campo RESPONSÁVEL."
+                );
 
-        mensagem += "\n\nCaso não exista saldo, informe 0.";
+                return;
 
-        mostrarAlertaCustomizado(mensagem);
-        return;
-    }
-    const pontosVazios = [];
-
-    itens.forEach((it, i) => {
-        const campoPeso = document.getElementById(`peso-${i}`);
-
-        if (campoPeso.value.trim() === "") {
-            pontosVazios.push(`${it.p}`);
-        }
-    });
-
-    if (pontosVazios.length > 0) {
-
-        let mensagem = "Existem pontos de contagem sem preenchimento.";
-
-        if (pontosVazios.length <= 5) {
-            mensagem += "\n\nPontos pendentes:";
-            pontosVazios.forEach(ponto => {
-                mensagem += `\n• ${ponto}`;
-            });
-        } else {
-            mensagem += `\n\nExistem ${pontosVazios.length} pontos sem preenchimento.`;
-            mensagem += "\n\nVerifique a tabela antes de enviar.";
-        }
-
-        mensagem += "\n\nCaso o ponto esteja vazio fisicamente, informe 0.";
-
-        mostrarAlertaCustomizado(mensagem);
-        return;
-    }
-
-            const dt = document.getElementById('current-time').innerText;
-            
-            const tV = document.getElementById('tot_v').innerText;
-            const t0 = document.getElementById('tot_0t').innerText;
-            const t10 = document.getElementById('tot_10t').innerText;
-            const tAcq = document.getElementById('tot_acq').innerText;
-            const tGlo = document.getElementById('tot_glo').innerText;
-            const tVal = document.getElementById('tot_val').innerText;
-
-            const sysV = document.getElementById('sys_v').value || "0";
-            const sys0 = document.getElementById('sys_0t').value || "0";
-            const sys10 = document.getElementById('sys_10t').value || "0";
-            const sysAcq = document.getElementById('sys_acq').value || "0";
-            const sysGlo = document.getElementById('sys_glo').value || "0";
-            const sysVal = document.getElementById('sys_val').value || "0";
-
-            const dV = document.getElementById('dif_v').innerText;
-            const d0 = document.getElementById('dif_0t').innerText;
-            const d10 = document.getElementById('dif_10t').innerText;
-            const dAcq = document.getElementById('dif_acq').innerText;
-            const dGlo = document.getElementById('dif_glo').innerText;
-            const dVal = document.getElementById('dif_val').innerText;
-
-            let detalhePontos = "--- DETALHAMENTO DOS PONTOS DE CONTAGEM ---%0D%0A";
-            let temItemPreenchido = false;
-
-            itens.forEach((it, i) => {
-                const pesoVal = document.getElementById(`peso-${i}`).value;
-                if (pesoVal && parseFloat(pesoVal) > 0) {
-                    temItemPreenchido = true;
-                    let linha = `- ${it.p} (${it.l}): ${pesoVal} KG`;
-                    
-                    if (it.type === "MIX") {
-                        const select = document.getElementById(`sel-${i}`);
-                        if (!select || !select.value) {
-                            linha += ` | [MIX -> NENHUMA RESINA SELECIONADA (100% PET)]`;
-                        } else {
-                            const txtResina = select.options[select.selectedIndex].text;
-                            const chk = document.querySelector(`input[name="m${i}"]:checked`);
-                            const proporcao = chk ? chk.dataset.val + "%" : "0% (Apenas PET)";
-                            linha += ` | [MIX -> Resina: ${txtResina} / Proporção: ${proporcao}]`;
-                        }
-                    } else {
-                        linha += ` | [Carga Fixa Base: ${it.type}]`;
-                    }
-                    detalhePontos += linha + "%0D%0A";
-                }
-            });
-
-            if (!temItemPreenchido) {
-                detalhePontos += "(Nenhum peso foi informado nos pontos de contagem)%0D%0A";
             }
 
-            const ass = `Inventário de Resinas - ${resp}`;
-            const corpo = `RELATÓRIO DE INVENTÁRIO DE RESINAS%0D%0AData/Hora: ${dt}%0D%0AResponsável: ${resp}%0D%0A%0D%0A--- BALANÇO DE SALDOS COMPLETO ---%0D%0A` +
-                `1. PET VIRGEM (0010006) -> Contagem: ${tV} KG | Saldo Sistema: ${sysV} KG | Diferença: ${dV} KG%0D%0A` +
-                `2. PCR 0T (0010048)     -> Contagem: ${t0} KG | Saldo Sistema: ${sys0} KG | Diferença: ${d0} KG%0D%0A` +
-                `3. PCR 10T (0010030)    -> Contagem: ${t10} KG | Saldo Sistema: ${sys10} KG | Diferença: ${d10} KG%0D%0A` +
-                `4. ACQUAMIX (0010023)   -> Contagem: ${tAcq} KG | Saldo Sistema: ${sysAcq} KG | Diferença: ${dAcq} KG%0D%0A` +
-                `5. VALGROUP (0010066)   -> Contagem: ${tGlo} KG | Saldo Sistema: ${sysGlo} KG | Diferença: ${dGlo} KG%0D%0A` +
-                `6. PCR GLOBAL (0010080) -> Contagem: ${tVal} KG | Saldo Sistema: ${sysVal} KG | Diferença: ${dVal} KG%0D%0A%0D%0A` +
-                detalhePontos +
-                `-------------------------------------------%0D%0AEnviado via App Inventário Spiltag.`;
 
-            window.location.href = `mailto:joao.pedroso@spiltag.com?cc=quenia.oliveira@spiltag.com&subject=${encodeURIComponent(ass)}&body=${corpo}`;
+            /* ========================================================
+               2. SALDOS DO SISTEMA
+            ======================================================== */
+
+            const camposSistema = [
+
+                {
+                    id: 'sys_v',
+                    nome: 'PET VIRGEM (0010006)'
+                },
+
+                {
+                    id: 'sys_0t',
+                    nome: 'PCR 0T (0010048)'
+                },
+
+                {
+                    id: 'sys_10t',
+                    nome: 'PCR 10T (0010030)'
+                },
+
+                {
+                    id: 'sys_acq',
+                    nome: 'ACQUAMIX (0010023)'
+                },
+
+                {
+                    id: 'sys_glo',
+                    nome: 'VALGROUP (0010066)'
+                },
+
+                {
+                    id: 'sys_val',
+                    nome: 'PCR GLOBAL (0010080)'
+                }
+
+            ];
+
+
+            const camposSistemaVazios =
+                camposSistema.filter(campo => {
+
+                    return document
+                        .getElementById(campo.id)
+                        .value
+                        .trim() === "";
+
+                });
+
+
+            if (camposSistemaVazios.length > 0) {
+
+                let mensagem =
+                    "Preencha os saldos na linha SISTEMA.";
+
+
+                if (
+                    camposSistemaVazios.length === 1
+                ) {
+
+                    mensagem +=
+                        "\n\nCampo pendente:";
+
+                    mensagem +=
+                        "\n" +
+                        camposSistemaVazios[0].nome;
+
+                }
+
+                else {
+
+                    mensagem +=
+                        "\n\nCampos pendentes:";
+
+
+                    camposSistemaVazios.forEach(campo => {
+
+                        mensagem +=
+                            "\n• " +
+                            campo.nome;
+
+                    });
+
+                }
+
+
+                mensagem +=
+                    "\n\nCaso não exista saldo, informe 0.";
+
+
+                mostrarAlertaCustomizado(
+                    mensagem
+                );
+
+
+                return;
+
+            }
+
+
+            /* ========================================================
+               3. PONTOS DE CONTAGEM
+            ======================================================== */
+
+            const pontosVazios = [];
+
+
+            itens.forEach((it, i) => {
+
+                const campoPeso =
+                    document.getElementById(
+                        `peso-${i}`
+                    );
+
+
+                /*
+                 * IMPORTANTE:
+                 * value === "" significa vazio.
+                 *
+                 * Se o usuário digitar 0:
+                 * value será "0"
+                 * e NÃO será considerado vazio.
+                 */
+
+                if (
+                    campoPeso.value.trim() === ""
+                ) {
+
+                    pontosVazios.push(
+                        it.p
+                    );
+
+                }
+
+            });
+
+
+            if (pontosVazios.length > 0) {
+
+                let mensagem =
+                    "Existem pontos de contagem sem preenchimento.";
+
+
+                /*
+                 * Se forem poucos pontos,
+                 * mostra todos.
+                 */
+
+                if (
+                    pontosVazios.length <= 8
+                ) {
+
+                    mensagem +=
+                        "\n\nPontos pendentes:";
+
+
+                    pontosVazios.forEach(ponto => {
+
+                        mensagem +=
+                            "\n• " +
+                            ponto;
+
+                    });
+
+                }
+
+                /*
+                 * Se forem muitos,
+                 * evita uma janela enorme.
+                 */
+
+                else {
+
+                    mensagem +=
+                        "\n\nExistem " +
+                        pontosVazios.length +
+                        " pontos sem preenchimento.";
+
+                    mensagem +=
+                        "\n\nVerifique a tabela antes de enviar.";
+
+                }
+
+
+                mensagem +=
+                    "\n\nCaso o ponto esteja vazio fisicamente, informe 0.";
+
+
+                mostrarAlertaCustomizado(
+                    mensagem
+                );
+
+
+                return;
+
+            }
+
+
+            /* ========================================================
+               4. DATA / HORA
+            ======================================================== */
+
+            const dt =
+                document.getElementById(
+                    'current-time'
+                ).innerText;
+
+
+            /* ========================================================
+               5. TOTAIS FÍSICOS
+            ======================================================== */
+
+            const tV =
+                document.getElementById(
+                    'tot_v'
+                ).innerText;
+
+            const t0 =
+                document.getElementById(
+                    'tot_0t'
+                ).innerText;
+
+            const t10 =
+                document.getElementById(
+                    'tot_10t'
+                ).innerText;
+
+            const tAcq =
+                document.getElementById(
+                    'tot_acq'
+                ).innerText;
+
+            const tGlo =
+                document.getElementById(
+                    'tot_glo'
+                ).innerText;
+
+            const tVal =
+                document.getElementById(
+                    'tot_val'
+                ).innerText;
+
+
+            /* ========================================================
+               6. SALDOS DO SISTEMA
+            ======================================================== */
+
+            const sysV =
+                document.getElementById(
+                    'sys_v'
+                ).value;
+
+            const sys0 =
+                document.getElementById(
+                    'sys_0t'
+                ).value;
+
+            const sys10 =
+                document.getElementById(
+                    'sys_10t'
+                ).value;
+
+            const sysAcq =
+                document.getElementById(
+                    'sys_acq'
+                ).value;
+
+            const sysGlo =
+                document.getElementById(
+                    'sys_glo'
+                ).value;
+
+            const sysVal =
+                document.getElementById(
+                    'sys_val'
+                ).value;
+
+
+            /* ========================================================
+               7. DIFERENÇAS
+            ======================================================== */
+
+            const dV =
+                document.getElementById(
+                    'dif_v'
+                ).innerText;
+
+            const d0 =
+                document.getElementById(
+                    'dif_0t'
+                ).innerText;
+
+            const d10 =
+                document.getElementById(
+                    'dif_10t'
+                ).innerText;
+
+            const dAcq =
+                document.getElementById(
+                    'dif_acq'
+                ).innerText;
+
+            const dGlo =
+                document.getElementById(
+                    'dif_glo'
+                ).innerText;
+
+            const dVal =
+                document.getElementById(
+                    'dif_val'
+                ).innerText;
+
+
+            /* ========================================================
+               8. DETALHAMENTO DOS PONTOS
+            ======================================================== */
+
+            let detalhePontos =
+                "--- DETALHAMENTO DOS PONTOS DE CONTAGEM ---%0D%0A";
+
+
+            itens.forEach((it, i) => {
+
+                const pesoVal =
+                    document.getElementById(
+                        `peso-${i}`
+                    ).value;
+
+
+                let linha =
+                    `- ${it.p} (${it.l}): ${pesoVal} KG`;
+
+
+                if (it.type === "MIX") {
+
+                    const select =
+                        document.getElementById(
+                            `sel-${i}`
+                        );
+
+
+                    if (
+                        !select ||
+                        !select.value
+                    ) {
+
+                        linha +=
+                            ` | [MIX -> NENHUMA RESINA SELECIONADA (100% PET)]`;
+
+                    }
+
+                    else {
+
+                        const txtResina =
+                            select.options[
+                                select.selectedIndex
+                            ].text;
+
+
+                        const chk =
+                            document.querySelector(
+                                `input[name="m${i}"]:checked`
+                            );
+
+
+                        const proporcao =
+                            chk
+                                ? chk.dataset.val + "%"
+                                : "0% (Apenas PET)";
+
+
+                        linha +=
+                            ` | [MIX -> Resina: ${txtResina} / Proporção: ${proporcao}]`;
+
+                    }
+
+                }
+
+                else {
+
+                    linha +=
+                        ` | [Carga Fixa Base: ${it.type}]`;
+
+                }
+
+
+                detalhePontos +=
+                    linha +
+                    "%0D%0A";
+
+            });
+
+
+            /* ========================================================
+               9. ASSUNTO DO E-MAIL
+            ======================================================== */
+
+            const ass =
+                `Inventário de Resinas - ${resp}`;
+
+
+            /* ========================================================
+               10. CORPO DO E-MAIL
+            ======================================================== */
+
+            const corpo =
+
+                `RELATÓRIO DE INVENTÁRIO DE RESINAS%0D%0A` +
+
+                `Data/Hora: ${dt}%0D%0A` +
+
+                `Responsável: ${resp}%0D%0A%0D%0A` +
+
+                `--- BALANÇO DE SALDOS COMPLETO ---%0D%0A` +
+
+                `1. PET VIRGEM (0010006) -> Contagem: ${tV} KG | Saldo Sistema: ${sysV} KG | Diferença: ${dV} KG%0D%0A` +
+
+                `2. PCR 0T (0010048)     -> Contagem: ${t0} KG | Saldo Sistema: ${sys0} KG | Diferença: ${d0} KG%0D%0A` +
+
+                `3. PCR 10T (0010030)    -> Contagem: ${t10} KG | Saldo Sistema: ${sys10} KG | Diferença: ${d10} KG%0D%0A` +
+
+                `4. ACQUAMIX (0010023)   -> Contagem: ${tAcq} KG | Saldo Sistema: ${sysAcq} KG | Diferença: ${dAcq} KG%0D%0A` +
+
+                `5. VALGROUP (0010066)   -> Contagem: ${tGlo} KG | Saldo Sistema: ${sysGlo} KG | Diferença: ${dGlo} KG%0D%0A` +
+
+                `6. PCR GLOBAL (0010080) -> Contagem: ${tVal} KG | Saldo Sistema: ${sysVal} KG | Diferença: ${dVal} KG%0D%0A%0D%0A` +
+
+                detalhePontos +
+
+                `-------------------------------------------%0D%0A` +
+
+                `Enviado via App Inventário Spiltag.`;
+
+
+            /* ========================================================
+               11. ABRE O OUTLOOK / CLIENTE DE E-MAIL
+            ======================================================== */
+
+            window.location.href =
+                `mailto:joao.pedroso@spiltag.com` +
+
+                `?cc=quenia.oliveira@spiltag.com` +
+
+                `&subject=${encodeURIComponent(ass)}` +
+
+                `&body=${corpo}`;
+
         }
+
     </script>
+
 </body>
 </html>
