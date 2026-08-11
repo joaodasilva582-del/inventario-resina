@@ -427,18 +427,80 @@
             // Limpa o nome do responsável
             document.getElementById('resp').value = '';
             
-            // Recalcula tudo para zerar as somas e as cores na tela
             calc();
-            // Fecha a janela de alerta
+           
             document.getElementById('custom-alert').style.display = 'none';
         }
 
-        function enviarEmail() {
-            const resp = document.getElementById('resp').value;
-            if (!resp) { 
-                mostrarAlertaCustomizado("Preencha o seu nome no campo Responsável."); 
-                return; 
-            }
+       function enviarEmail() {
+    const resp = document.getElementById('resp').value.trim();
+
+    if (!resp) {
+        mostrarAlertaCustomizado(
+            "Preencha o seu nome no campo RESPONSÁVEL."
+        );
+        return;
+    }
+    const camposSistema = [
+        { id: 'sys_v',   nome: 'PET VIRGEM (0010006)' },
+        { id: 'sys_0t',  nome: 'PCR 0T (0010048)' },
+        { id: 'sys_10t', nome: 'PCR 10T (0010030)' },
+        { id: 'sys_acq', nome: 'ACQUAMIX (0010023)' },
+        { id: 'sys_glo', nome: 'VALGROUP (0010066)' },
+        { id: 'sys_val', nome: 'PCR GLOBAL (0010080)' }
+    ];
+
+    const camposVazios = camposSistema.filter(campo => {
+        return document.getElementById(campo.id).value.trim() === "";
+    });
+
+    if (camposVazios.length > 0) {
+
+        let mensagem = "Preencha os saldos na linha SISTEMA.";
+
+        if (camposVazios.length === 1) {
+            mensagem += `\n\nCampo pendente:\n${camposVazios[0].nome}`;
+        } else {
+            mensagem += "\n\nCampos pendentes:";
+            camposVazios.forEach(campo => {
+                mensagem += `\n• ${campo.nome}`;
+            });
+        }
+
+        mensagem += "\n\nCaso não exista saldo, informe 0.";
+
+        mostrarAlertaCustomizado(mensagem);
+        return;
+    }
+    const pontosVazios = [];
+
+    itens.forEach((it, i) => {
+        const campoPeso = document.getElementById(`peso-${i}`);
+
+        if (campoPeso.value.trim() === "") {
+            pontosVazios.push(`${it.p}`);
+        }
+    });
+
+    if (pontosVazios.length > 0) {
+
+        let mensagem = "Existem pontos de contagem sem preenchimento.";
+
+        if (pontosVazios.length <= 5) {
+            mensagem += "\n\nPontos pendentes:";
+            pontosVazios.forEach(ponto => {
+                mensagem += `\n• ${ponto}`;
+            });
+        } else {
+            mensagem += `\n\nExistem ${pontosVazios.length} pontos sem preenchimento.`;
+            mensagem += "\n\nVerifique a tabela antes de enviar.";
+        }
+
+        mensagem += "\n\nCaso o ponto esteja vazio fisicamente, informe 0.";
+
+        mostrarAlertaCustomizado(mensagem);
+        return;
+    }
 
             const dt = document.getElementById('current-time').innerText;
             
