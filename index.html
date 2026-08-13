@@ -2,1025 +2,2064 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Contagem Resinas - Final</title>
     
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="icon-192.png" type="image/png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link class="apple-touch-icon" href="icon-192.png">
+    <meta name="theme-color" content="#a51c30">
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
     
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Inventário Spiltag</title>
     <style>
         :root {
-            --accent: #9f1d2f;
-            --accent-dark: #7d1625;
-            --accent-soft: #f4e4e4;
-            --cream: #f6f0e7;
-            --cream-2: #efe2d1;
-            --surface: #fffdf9;
-            --surface-2: #fbf5ed;
-            --text: #332b27;
-            --muted: #7e7068;
-            --border: #e8d9cb;
-            --shadow: 0 8px 24px rgba(79, 48, 35, 0.10);
-            --shadow-soft: 0 3px 12px rgba(79, 48, 35, 0.08);
+            --border: #000;
+            --header-bg: #e9e9e9;
+            --accent: #a51c30;
+            --btn-grey: #666666;
+            --btn-blue: #0056b3;
         }
 
-        * { box-sizing: border-box; }
-        html, body { margin: 0; padding: 0; width: 100%; min-height: 100%; }
         body {
-            font-family: "Segoe UI", Calibri, Arial, sans-serif;
-            background: var(--cream);
-            color: var(--text);
-            overflow-x: hidden;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
         }
 
-        /* LOGIN */
+        /* =========================
+           TELA DE LOGIN
+        ========================= */
         #login-screen {
-            position: fixed; inset: 0;
-            width: 100vw; height: 100vh;
-            display: flex; justify-content: center; align-items: center;
-            background: linear-gradient(135deg, #f7f2eb 0%, #eee3d6 100%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f4f4f4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             z-index: 9999;
-            padding: 24px;
         }
+
         .login-box {
-            width: 430px; max-width: 94vw;
-            background: var(--surface);
-            padding: 38px 38px 34px;
-            border-radius: 22px;
-            border: 1px solid var(--border);
-            border-top: 6px solid var(--accent);
-            text-align: center;
-            box-shadow: var(--shadow);
-        }
-        .login-brand { min-height: 70px; display:flex; align-items:center; justify-content:center; margin-bottom: 4px; }
-        .login-logo { max-width: 230px; max-height: 72px; object-fit: contain; }
-        .login-fallback { display:none; color:var(--accent); font-size:36px; font-weight:700; letter-spacing:2px; }
-        .login-subtitle { margin: 8px 0 28px; font-size: 17px; font-weight: 500; letter-spacing: .5px; color: var(--muted); }
-        .login-box input {
-            width: 100%; padding: 15px 16px; margin: 8px 0;
-            border: 1px solid var(--border); border-radius: 12px;
-            background: #fff; color: var(--text);
-            font-size: 16px; font-weight: 500; outline: none;
-            transition: .2s ease;
-        }
-        .login-box input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(159,29,47,.10); }
-
-        /* BASE */
-        #app-container { display: none; background: var(--cream); padding: 18px; min-height: 100vh; }
-        table { border-collapse: separate; border-spacing: 0; width: 100%; margin-bottom: 18px; }
-
-        /* CABEÇALHO */
-        .header-table {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            overflow: hidden;
-            box-shadow: var(--shadow-soft);
-        }
-        .header-table td { padding: 11px 14px; border: 0; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); font-weight: 500; }
-        .header-table tr:last-child td { border-bottom: 0; }
-        .header-table td:last-child { border-right: 0; }
-        .brand-cell { background: #fff; text-align:center; vertical-align:middle; }
-        .brand-logo { max-width: 190px; max-height: 70px; object-fit: contain; margin: 0 auto; }
-        .brand-fallback { display:none; color:var(--accent); font-size:28px; font-weight:700; letter-spacing:1.5px; }
-        .title-box {
-            background: var(--surface-2);
-            color: var(--text);
-            font-size: 20px;
-            text-align: center;
-            font-weight: 650 !important;
-            letter-spacing: .2px;
-        }
-        #data-hora { background: var(--surface-2); color: var(--accent-dark); font-weight: 600 !important; }
-        #linha-responsavel span { color: var(--accent-dark); font-weight: 600; }
-        #resp-name { background:#fff !important; border:1px solid var(--border) !important; border-radius:10px !important; padding:9px 12px !important; min-height:38px; }
-
-        /* SEÇÕES */
-        .instr-box, .section-title {
-            background: var(--surface);
-            color: var(--text);
-            text-align: center;
-            font-weight: 650;
-            border: 1px solid var(--border) !important;
-            border-radius: 16px;
-            box-shadow: var(--shadow-soft);
-            text-transform: uppercase;
-        }
-        .instr-box { font-size: 23px; padding: 18px 16px; margin-bottom: 12px; }
-        .section-title { font-size: 20px; padding: 14px 12px; margin-bottom: 10px; }
-        .instr-box span[style*="color:red"] { color: var(--accent) !important; }
-
-        /* TABELAS */
-        .main-table {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: var(--shadow-soft);
-        }
-        .main-table th {
-            background: var(--accent) !important;
-            color: #fff;
-            padding: 12px 8px;
-            font-size: 14px;
-            text-transform: uppercase;
-            border: 0;
-            border-right: 1px solid rgba(255,255,255,.22);
-            font-weight: 600;
-        }
-        .main-table th:first-child { border-top-left-radius: 15px; }
-        .main-table th:last-child { border-top-right-radius: 15px; border-right: 0; }
-        .th-red { background: var(--accent-dark) !important; }
-        .th-navy { background: var(--accent) !important; }
-        .main-table td {
-            height: 44px;
-            padding: 5px 7px;
-            position: relative;
-            border: 0;
-            border-right: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            background: var(--surface);
-            font-size: 13px;
-            font-weight: 500;
-        }
-        .main-table tr:last-child td { border-bottom: 0; }
-        .main-table td:last-child { border-right: 0; }
-
-        input.cell-input {
-            width: 100%; min-height: 34px;
-            border: 1px solid var(--border) !important;
-            border-radius: 9px;
-            padding: 5px 9px;
-            font-size: 13px; font-weight: 500;
-            outline: none; background: #fff;
-            color: var(--text);
-            transition: .15s ease;
-        }
-        input.cell-input:not(.cell-readonly):focus { border-color: var(--accent) !important; box-shadow: 0 0 0 2px rgba(159,29,47,.09); }
-        input.cell-readonly {
-            background: transparent;
-            border-color: transparent !important;
-            color: #665b55;
-            pointer-events: none;
-        }
-        .text-center { text-align: center; }
-
-        /* BOTÕES */
-        .btn-login, .btn-confirm, .btn-save {
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            font-weight: 650;
+            background: white;
+            padding: 40px;
             border-radius: 12px;
-            transition: .18s ease;
-        }
-        .btn-login, .btn-confirm { padding: 13px 20px; font-size: 15px; min-width: 120px; }
-        .btn-save { padding: 13px 24px; float:right; margin-top:10px; margin-left:10px; }
-        .btn-login:hover, .btn-confirm:hover, .btn-save:hover { background: var(--accent-dark); transform: translateY(-1px); }
-        .btn-no { padding: 12px 20px; background: var(--surface-2); color: var(--text); border:1px solid var(--border); cursor:pointer; font-weight:600; font-size:15px; border-radius:12px; min-width:120px; }
-        #btn-sair, #btn-imprimir {
-            color: white; padding: 13px 24px; border:none; border-radius:12px;
-            cursor:pointer; font-weight:650; float:left; margin-top:10px;
-        }
-        #btn-sair { background: var(--accent-dark); }
-        #btn-imprimir { background: #b98f6d; margin-left:10px; }
-        .btn-calc { background: var(--cream-2); color:var(--accent-dark); border:1px solid var(--border); border-radius:7px; cursor:pointer; padding:0 5px; font-size:11px; height:22px; position:absolute; right:10px; top:11px; }
-
-        /* DASHBOARD */
-        .cards-container { display:flex; gap:16px; margin:16px 0; }
-        .card {
-            background: var(--surface);
-            border:1px solid var(--border);
-            padding:20px;
-            flex:1;
-            border-radius:16px;
-            box-shadow: var(--shadow-soft);
-        }
-        .card h4 { margin:0 0 8px; font-size:14px; color:var(--muted); text-transform:uppercase; }
-        .card p { margin:0; font-size:30px; font-weight:650; color:var(--accent-dark); }
-        .filter-bar {
-            background: var(--surface);
-            padding:14px;
-            border:1px solid var(--border);
-            border-radius:16px;
-            box-shadow: var(--shadow-soft);
-            margin-bottom:16px;
-            display:flex; gap:14px; align-items:center;
-        }
-        .filter-bar select, .filter-bar input {
-            padding:10px 12px; font-weight:500;
-            border:1px solid var(--border); border-radius:10px;
-            background:#fff; color:var(--text); outline:none;
-        }
-        .filter-bar button { border:1px solid var(--border) !important; background:var(--surface-2) !important; border-radius:10px !important; color:var(--accent-dark); }
-
-        /* MODAIS */
-        .modal { display:none; position:fixed; z-index:1000; inset:0; width:100%; height:100%; background:rgba(54,38,31,.58); backdrop-filter: blur(2px); }
-        .modal-content { background:var(--surface); margin:12% auto; padding:30px; border:1px solid var(--border); width:450px; max-width:90vw; text-align:center; border-radius:18px; box-shadow:var(--shadow); }
-        .modal-content h3 { color:var(--accent-dark); }
-        .modal-btns { display:flex; justify-content:center; gap:10px; margin-top:25px; flex-wrap:wrap; }
-        .calc-input { width:100%; margin-bottom:12px; border:1px solid var(--border); border-radius:10px; padding:14px 10px; font-size:18px; font-weight:700; }
-
-        @media (max-width: 900px) {
-            #app-container { padding:10px; }
-            .cards-container { flex-direction:column; }
-            .filter-bar { flex-wrap:wrap; }
-            .instr-box { font-size:18px; }
-            .title-box { font-size:17px; }
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+            border-top: 6px solid var(--accent);
         }
 
+        .login-box h1 {
+            color: var(--accent);
+            margin: 0 0 10px 0;
+            font-size: 32px;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        .login-box p {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+            background-color: #fff;
+            text-align: center;
+        }
+
+        .login-box input::placeholder {
+            color: #888;
+            font-weight: normal;
+            opacity: 1;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: 20px;
+            text-transform: uppercase;
+        }
+
+        /* =========================
+           CONTEÚDO PRINCIPAL
+        ========================= */
+        #app-content {
+            display: none;
+            padding: 5px;
+            background-color: #fff;
+        }
+
+        .no-print {
+            margin-bottom: 10px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .btn-pdf {
+            padding: 10px 18px;
+            cursor: pointer;
+            border: 1px solid #000;
+            background-color: var(--accent);
+            color: white;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        .btn-clear {
+            padding: 10px 18px;
+            cursor: pointer;
+            border: 1px solid #000;
+            background-color: var(--btn-grey);
+            color: white;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        .btn-email {
+            padding: 10px 18px;
+            cursor: pointer;
+            border: 1px solid #000;
+            background-color: var(--btn-blue);
+            color: white;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        .container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 1250px;
+            table-layout: fixed;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 5px 2px;
+            text-align: center;
+            word-wrap: break-word;
+            font-size: 12px;
+        }
+
+        .bg-grey {
+            background-color: var(--header-bg);
+            font-weight: bold;
+        }
+
+        .bg-spiltag {
+            background-color: var(--accent);
+            color: white;
+            font-weight: bold;
+        }
+
+        .editable {
+            background-color: #fffdec;
+            border: 1px solid #ccc !important;
+        }
+
+        input[type="number"],
+        input[type="text"].table-input {
+            width: 95%;
+            border: none;
+            text-align: center;
+            background: transparent;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        select.select-resina {
+            width: 98%;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px;
+            border: 1px solid #bbb;
+            border-radius: 4px;
+        }
+
+        .logo-box {
+            color: var(--accent);
+            font-size: 30px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .img-logo-tabela {
+            max-width: 90px;
+            max-height: 90px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .resp-label {
+            background-color: var(--accent);
+            color: white;
+            font-weight: bold;
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        .res-val {
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .sub-cod {
+            font-size: 9px !important;
+            font-weight: normal !important;
+            color: #ddd !important;
+            display: block;
+        }
+
+        /* =========================
+           ALERTA PERSONALIZADO
+        ========================= */
+        #custom-alert {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .alert-content {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 400px;
+            width: 85%;
+            border-top: 8px solid var(--accent);
+            box-sizing: border-box;
+        }
+
+        .alert-content h2 {
+            margin-top: 0;
+            color: var(--accent);
+        }
+
+        .alert-content p {
+            white-space: pre-line;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .btn-alert-ok {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* =========================
+           IMPRESSÃO
+        ========================= */
         @media print {
-            body { background:#fff; color:#000; font-size:12px; }
-            #login-screen, .modal, #btn-sair, #btn-imprimir, .btn-save, .btn-calc, .filter-bar { display:none !important; }
-            #app-container { display:block !important; padding:0; margin:0; width:100%; background:#fff; }
-            .header-table, .main-table, .card, .instr-box, .section-title { box-shadow:none !important; }
-            .main-table th { background-color:#9f1d2f !important; color:#fff !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-            .title-box, .instr-box, .section-title { background-color:#f7f0e8 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; color:#000 !important; }
-            table { page-break-inside:auto; }
-            tr { page-break-inside:avoid; page-break-after:auto; }
-            input { box-shadow:none !important; }
+            .no-print,
+            #login-screen,
+            #custom-alert {
+                display: none !important;
+            }
+
+            body {
+                zoom: 70%;
+            }
+
+            table {
+                width: 100% !important;
+                table-layout: fixed !important;
+            }
+
+            .bg-spiltag {
+                background-color: var(--accent) !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+            }
+
+            .bg-grey {
+                background-color: var(--header-bg) !important;
+                -webkit-print-color-adjust: exact;
+            }
         }
     </style>
 </head>
+
 <body>
-    <div id="login-screen">
-        <div class="login-box">
-            <div class="login-brand">
-                <img src="logo.png" class="login-logo" alt="Spiltag" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                <div class="login-fallback">SPILTAG</div>
-            </div>
-            <div class="login-subtitle">SISTEMA DE DIGITAÇÃO</div>
-            <input type="text" id="user" placeholder="Usuário" onkeydown="if(event.key==='Enter') document.getElementById('pass').focus()">
-            <input type="password" id="pass" placeholder="Senha" onkeydown="if(event.key==='Enter') autenticar()">
-            <button class="btn-login" style="width: 100%; margin-top: 14px;" onclick="autenticar()">ENTRAR NO SISTEMA</button>
-            <p id="error-msg" style="color: var(--accent); font-size: 13px; display: none; margin-top: 12px; font-weight: 800;">Acesso negado!</p>
+
+    <!-- =========================
+         ALERTA
+    ========================= -->
+    <div id="custom-alert">
+        <div class="alert-content">
+            <h2 id="alert-title">ATENÇÃO!</h2>
+            <p id="alert-msg"></p>
+            <div id="alert-btns"></div>
         </div>
     </div>
 
-    <div id="app-container">
-        <table class="header-table">
-            <tr>
-                <td rowspan="2" class="brand-cell" style="width:20%;">
-                    <img src="logo.png" class="brand-logo" alt="Spiltag" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                    <div class="brand-fallback">SPILTAG</div>
-                </td>
-                <td class="title-box" id="label-setor" style="width:55%;">REGISTRO DE INVENTÁRIO</td>
-                <td style="width:25%; text-align:center; font-size:14px;" id="data-hora">--/--/---- --:--:--</td>
-            </tr>
-            <tr id="linha-responsavel">
-                <td colspan="2" style="padding: 0;">
-                    <div style="display: flex; align-items: center; width: 100%; height: 100%;">
-                        <span style="padding: 5px 10px; white-space: nowrap;">RESPONSÁVEL:</span>
-                        <input type="text" id="resp-name" class="cell-input" style="flex-grow: 1;" placeholder="digite seu nome...">
-                    </div>
-                </td>
-            </tr>
-        </table>
-        
-        <div id="operator-panel">
-            <div id="bloco-papi-geral">
-                <div class="instr-box">REGISTRO DE PA E PI (BIPAR <span style="color:red">UMA</span> ETIQUETA DE CADA CÓDIGO E INFORMAR A QUANTIDADE DE <span style="color:red">CAIXAS</span>)</div>
-                <table class="main-table">
-                    <thead>
-                        <tr>
-                            <th class="th-red" style="width: 18%;">Código Lido</th>
-                            <th class="th-navy" style="width: 18%;">Código do Material</th>
-                            <th class="th-navy" style="width: 30%;">Descrição do Material</th>
-                            <th class="th-navy" style="width: 12%;">Lote</th>
-                            <th class="th-navy" style="width: 8%;">UM</th>
-                            <th class="th-red" style="width: 14%;">Quantidade</th>
-                        </tr>
-                    </thead>
-                    <tbody id="corpo-papi"></tbody>
-                </table>
-            </div>
-            
-            <div id="bloco-insumos-geral">
-                <div class="section-title">Registro de Insumos - Geral</div>
-                <table class="main-table">
-                    <thead>
-                        <tr>
-                            <th class="th-navy" style="width: 18%;">Código Lido</th>
-                            <th class="th-navy" style="width: 18%;">Código do Material</th>
-                            <th class="th-navy" style="width: 30%;">Descrição do Material</th>
-                            <th class="th-navy" style="width: 12%;">Lote</th>
-                            <th class="th-navy" style="width: 8%;">UM</th>
-                            <th class="th-red" style="width: 14%;">Quantidade</th>
-                        </tr>
-                    </thead>
-                    <tbody id="corpo-insumos"></tbody>
-                </table>
-            </div>
+    <!-- =========================
+         LOGIN
+    ========================= -->
+    <div id="login-screen">
+        <div class="login-box">
+            <h1>SPILTAG</h1>
+            <p>INVENTÁRIO DE RESINAS</p>
 
-            <div id="bloco-papi-sleeve" style="display: none;">
-                <div class="section-title">Registro de Inventário do Sleeve - PA e PI</div>
-                <table class="main-table">
-                    <thead>
-                        <tr>
-                            <th class="th-red" style="width: 18%;">Código Lido</th>
-                            <th class="th-navy" style="width: 18%;">Código do Material</th>
-                            <th class="th-navy" style="width: 30%;">Descrição do Material</th>
-                            <th class="th-navy" style="width: 12%;">Lote</th>
-                            <th class="th-navy" style="width: 8%;">UM</th>
-                            <th class="th-red" style="width: 14%;">Quantidade</th>
-                        </tr>
-                    </thead>
-                    <tbody id="corpo-papi-sleeve"></tbody>
-                </table>
-            </div>
+            <input
+                type="text"
+                id="user_in"
+                placeholder="Usuário"
+            >
 
-            <div id="bloco-insumos-sleeve" style="display: none;">
-                <div class="section-title">Sleeve - Embalagem</div>
-                <table class="main-table">
-                    <thead>
-                        <tr>
-                            <th class="th-navy" style="width: 18%;">Código Lido</th>
-                            <th class="th-navy" style="width: 18%;">Código do Material</th>
-                            <th class="th-navy" style="width: 30%;">Descrição do Material</th>
-                            <th class="th-navy" style="width: 12%;">Lote</th>
-                            <th class="th-navy" style="width: 8%;">UM</th>
-                            <th class="th-red" style="width: 14%;">Quantidade</th>
-                        </tr>
-                    </thead>
-                    <tbody id="corpo-insumos-sleeve"></tbody>
-                </table>
-            </div>
+            <input
+                type="password"
+                id="pass_in"
+                placeholder="Senha"
+            >
 
-            <div id="bloco-resinas-dinamo" style="display: none;">
-                <div class="section-title">Registro de Resinas</div>
-                <table class="main-table">
-                    <thead>
-                        <tr>
-                            <th class="th-navy" style="width: 18%;">Código Lido</th>
-                            <th class="th-navy" style="width: 18%;">Código do Material</th>
-                            <th class="th-navy" style="width: 30%;">Descrição do Material</th>
-                            <th class="th-navy" style="width: 12%;">Lote</th>
-                            <th class="th-navy" style="width: 8%;">UM</th>
-                            <th class="th-red" style="width: 14%;">Quantidade</th>
-                        </tr>
-                    </thead>
-                    <tbody id="corpo-resinas-dinamo"></tbody>
-                </table>
-            </div>
+            <button
+                class="btn-login"
+                onclick="validarAcesso()"
+            >
+                ENTRAR NO SISTEMA
+            </button>
+        </div>
+    </div>
 
-            <div id="bloco-master-dinamo" style="display: none;">
-                <div class="section-title">Registro de Master</div>
-                <table class="main-table">
-                    <thead>
-                        <tr>
-                            <th class="th-red" style="width: 18%;">Código Lido</th>
-                            <th class="th-navy" style="width: 18%;">Código do Material</th>
-                            <th class="th-navy" style="width: 30%;">Descrição do Material</th>
-                            <th class="th-navy" style="width: 12%;">Lote</th>
-                            <th class="th-navy" style="width: 8%;">UM</th>
-                            <th class="th-red" style="width: 14%;">Quantidade</th>
-                        </tr>
-                    </thead>
-                    <tbody id="corpo-master-dinamo"></tbody>
-                </table>
-            </div>
+    <!-- =========================
+         APP
+    ========================= -->
+    <div id="app-content">
+
+        <div class="no-print">
+
+            <button
+                class="btn-pdf"
+                onclick="window.print()"
+            >
+                IMPRIMIR PDF
+            </button>
+
+            <button
+                class="btn-email"
+                onclick="enviarEmail()"
+            >
+                ENVIAR RELATÓRIO
+            </button>
+
+            <button
+                class="btn-clear"
+                onclick="confirmarLimpeza()"
+            >
+                LIMPAR TUDO
+            </button>
+
         </div>
 
-        <div id="engineering-panel" style="display: none;">
-            <div class="cards-container">
-                <div class="card"><h4>Operações Registradas</h4><p id="dash-ops">0</p></div>
-                <div class="card"><h4>Total de Itens Contados</h4><p id="dash-itens">0</p></div>
-            </div>
-            <div class="filter-bar">
-                <span>Filtrar Setor:</span>
-                <select id="filtro-setor" onchange="renderizarTabelaDash()">
-                    <option value="TODOS">Todos os Setores</option>
-                    <option value="INJEÇÃO E SOPRO">Injeção e Sopro</option>
-                    <option value="DECORAÇÃO">Decoração</option>
-                    <option value="DÍNAMO">Dínamo</option>
-                    <option value="MASTER">Master</option>
-                </select>
-                <span>Busca Rápida:</span>
-                <input type="text" id="busca-dash" placeholder="Responsável ou Código..." oninput="renderizarTabelaDash()">
-                <button onclick="carregarDadosDash()" style="margin-left: auto; padding: 6px 12px; cursor: pointer; font-weight: bold;">🔄 Atualizar Dados</button>
-            </div>
-            <table class="main-table">
-                <thead>
-                    <tr style="background: var(--navy); color: #fff;">
-                        <th style="padding:8px;">Data/Hora</th>
-                        <th>Setor</th>
-                        <th>Responsável</th>
-                        <th>Código Material</th>
-                        <th>Descrição</th>
-                        <th>Lote</th>
-                        <th>UM</th>
-                        <th>Quantidade</th>
-                    </tr>
-                </thead>
-                <tbody id="corpo-dash" class="text-center" style="background:#fff;">
-                    <tr><td colspan="8" style="padding:20px; color:#666;">Carregando banco de dados...</td></tr>
-                </tbody>
+        <div class="container">
+
+            <table>
+
+                <colgroup>
+                    <col style="width: 14%;">
+                    <col style="width: 10%;">
+                    <col style="width: 5%;">
+                    <col style="width: 7%;">
+                    <col style="width: 16%;">
+                    <col style="width: 3.5%;">
+                    <col style="width: 3.5%;">
+                    <col style="width: 3.5%;">
+                    <col style="width: 3.5%;">
+                    <col style="width: 6.8%;">
+                    <col style="width: 6.8%;">
+                    <col style="width: 6.8%;">
+                    <col style="width: 6.8%;">
+                    <col style="width: 6.8%;">
+                    <col style="width: 6.8%;">
+                </colgroup>
+
+                <!-- =========================
+                     CABEÇALHO
+                ========================= -->
+                <tr>
+
+                    <td
+                        rowspan="4"
+                        style="background-color: #fff;"
+                    >
+                        <img
+                            src="icon-192.png"
+                            alt="Spiltag"
+                            class="img-logo-tabela"
+                        >
+                    </td>
+
+                    <td
+                        colspan="4"
+                        id="current-time"
+                        style="font-weight: bold; border-bottom: none;"
+                    >
+                        --/--/---- --:--:--
+                    </td>
+
+                    <td
+                        class="bg-spiltag"
+                        colspan="4"
+                    >
+                        SALDO
+                    </td>
+
+                    <td class="bg-spiltag">
+                        PET VIRGEM
+                        <span class="sub-cod">(0010006)</span>
+                    </td>
+
+                    <td class="bg-spiltag">
+                        PCR 0T
+                        <span class="sub-cod">(0010048)</span>
+                    </td>
+
+                    <td class="bg-spiltag">
+                        PCR 10T
+                        <span class="sub-cod">(0010030)</span>
+                    </td>
+
+                    <td class="bg-spiltag">
+                        ACQUAMIX
+                        <span class="sub-cod">(0010023)</span>
+                    </td>
+
+                    <td class="bg-spiltag">
+                        VALGROUP
+                        <span class="sub-cod">(0010066)</span>
+                    </td>
+
+                    <td class="bg-spiltag">
+                        PCR GLOBAL
+                        <span class="sub-cod">(0010080)</span>
+                    </td>
+
+                </tr>
+
+                <!-- =========================
+                     SISTEMA
+                ========================= -->
+                <tr>
+
+                    <td
+                        colspan="4"
+                        class="resp-label"
+                    >
+                        RESPONSÁVEL
+                    </td>
+
+                    <td
+                        class="bg-spiltag"
+                        colspan="4"
+                    >
+                        SISTEMA
+                    </td>
+
+                    <td>
+                        <input
+                            type="number"
+                            id="sys_v"
+                            class="editable res-val"
+                            oninput="calc()"
+                        >
+                    </td>
+
+                    <td>
+                        <input
+                            type="number"
+                            id="sys_0t"
+                            class="editable res-val"
+                            oninput="calc()"
+                        >
+                    </td>
+
+                    <td>
+                        <input
+                            type="number"
+                            id="sys_10t"
+                            class="editable res-val"
+                            oninput="calc()"
+                        >
+                    </td>
+
+                    <td>
+                        <input
+                            type="number"
+                            id="sys_acq"
+                            class="editable res-val"
+                            oninput="calc()"
+                        >
+                    </td>
+
+                    <td>
+                        <input
+                            type="number"
+                            id="sys_glo"
+                            class="editable res-val"
+                            oninput="calc()"
+                        >
+                    </td>
+
+                    <td>
+                        <input
+                            type="number"
+                            id="sys_val"
+                            class="editable res-val"
+                            oninput="calc()"
+                        >
+                    </td>
+
+                </tr>
+
+                <!-- =========================
+                     RESPONSÁVEL / SOMA
+                ========================= -->
+                <tr>
+
+                    <td
+                        colspan="4"
+                        rowspan="2"
+                        style="padding: 10px;"
+                    >
+                        <input
+                            type="text"
+                            id="resp"
+                            class="editable table-input"
+                            placeholder="Nome Completo"
+                            style="font-size: 16px; width: 90%;"
+                        >
+                    </td>
+
+                    <td
+                        class="bg-spiltag"
+                        colspan="4"
+                    >
+                        SOMA
+                    </td>
+
+                    <td
+                        id="som_v"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="som_0t"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="som_10t"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="som_acq"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="som_glo"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="som_val"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                </tr>
+
+                <!-- =========================
+                     DIFERENÇA
+                ========================= -->
+                <tr>
+
+                    <td
+                        class="bg-spiltag"
+                        colspan="4"
+                    >
+                        DIFERENÇA
+                    </td>
+
+                    <td
+                        id="dif_v"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="dif_0t"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="dif_10t"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="dif_acq"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="dif_glo"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="dif_val"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                </tr>
+
+                <!-- =========================
+                     CABEÇALHO DA TABELA
+                ========================= -->
+                <tr class="bg-grey">
+
+                    <th rowspan="2">
+                        Ponto de Contagem
+                    </th>
+
+                    <th rowspan="2">
+                        Localização
+                    </th>
+
+                    <th rowspan="2">
+                        Cap.
+                    </th>
+
+                    <th rowspan="2">
+                        Peso (KG)
+                    </th>
+
+                    <th rowspan="2">
+                        Configuração da Carga / Resina Base
+                    </th>
+
+                    <th colspan="4">
+                        Proporção do Mix Selecionado
+                    </th>
+
+                    <th colspan="6">
+                        Distribuição Líquida Calculada (KG)
+                    </th>
+
+                </tr>
+
+                <tr
+                    class="bg-grey"
+                    style="font-size: 11px;"
+                >
+
+                    <th>25%</th>
+                    <th>50%</th>
+                    <th>75%</th>
+                    <th>100%</th>
+
+                    <th>PET VIRGEM</th>
+                    <th>PCR 0T</th>
+                    <th>PCR 10T</th>
+                    <th>ACQUAMIX</th>
+                    <th>VALGROUP</th>
+                    <th>PCR GLOBAL</th>
+
+                </tr>
+
+                <tbody id="table-body"></tbody>
+
+                <!-- =========================
+                     TOTAL
+                ========================= -->
+                <tr class="bg-grey">
+
+                    <td
+                        colspan="9"
+                        style="text-align:right; font-weight:bold;"
+                    >
+                        SOMA TOTAL FÍSICA:
+                    </td>
+
+                    <td
+                        id="tot_v"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="tot_0t"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="tot_10t"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="tot_acq"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="tot_glo"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                    <td
+                        id="tot_val"
+                        class="res-val"
+                    >
+                        0.0
+                    </td>
+
+                </tr>
+
             </table>
+
         </div>
-        
-        <div style="margin-top: 20px; overflow: hidden;">
-            <button id="btn-sair" onclick="tentarSair()">SAIR</button>
-            <button id="btn-imprimir" onclick="window.print()">IMPRIMIR</button>
-            <button class="btn-save" id="btn-salvar" onclick="validarResponsavel()">SALVAR INVENTÁRIO</button>
-        </div>
+
     </div>
 
     <script>
-        const urlPlanilha = "https://script.google.com/macros/s/AKfycbwWO_GwwvNnGrotSbcI6CY2mvlAxH0tdcCKoP6b7-ymEvg3qFWFKH_-PsKaGRkQ4MyB/exec";
 
-        let setorLogado = "";
-        let lAlvo = null; let tAlvo = null; let tabAlvo = null;
-        let processandoBipe = false;
-        let dadosGlobaisDash = [];
+        /* ============================================================
+           PONTOS DE CONTAGEM
+        ============================================================ */
 
-        const configSetores = {
-            "injesop": { pass: "sopro@1324", label: "INJEÇÃO E SOPRO", linhasPA: 25 },
-            "decoracao": { pass: "deco@1324", label: "DECORAÇÃO", linhasPA: 15 },
-            "dinamo": { pass: "dina@1324", label: "DÍNAMO", linhasPA: 10 },
-            "master": { pass: "master@1324", label: "MASTER", linhasPA: 80 },
-            "engprocessos": { pass: "eng@1324", label: "ENGENHARIA DE PROCESSOS" }
-        };
+        const itens = [
 
-        const insumosInjeSopro = [
-            {id:'0040033', um:'RL', ds:'FITA ADESIVA DE PAPEL CREPADO 68X50', calc:'Fita'},
-            {id:'0040034', um:'KG', ds:'FITA DE PAPEL GOMADO 70MM S REFORCO'},
-            {id:'0040026', um:'UN', ds:'LAMINA COSM. 68 X 40 X 0,03 CM', calc:'Lamina Fina'},
-            {id:'0040023', um:'UN', ds:'LAMINA COSM. 41 X 59 X 0,13 CM', calc:'Lamina Grossa'},
-            {id:'0040055', um:'UN', ds:'LAMINA TNT GR15 68X40 10 G', calc:'Lamina TNT'},
-            {id:'0030069', um:'UN', ds:'CHAPA DE PAPELAO 1200 X 1000'},
-            {id:'0030057', um:'UN', ds:'CANTONEIRA 50 X 50 X 3 X 1050'},
-            {id:'0060037', um:'UN', ds:'CANTONEIRA 50 X 50 X 3 X1760'},
-            {id:'0030015', um:'UN', ds:'CAIXA PAPELAO TIPO 01 P/ COSM. 600 X 400 X 337'},
-            {id:'0040005', um:'UN', ds:'SACO TIPO 01 P/ CAIXA DE COSM.'},
-            {id:'0030038', um:'UN', ds:'CAIXA PAPELAO TIPO 03 P/ COSM. 600 X 400'},
-            {id:'0040025', um:'UN', ds:'SACO TIPO 03 P/ CAIXA COSM. 107 X 110 X 0,0'},
-            {id:'0030052', um:'UN', ds:'CAIXA PAPELAO TIPO 04 P/COSM. 600X400X337 SPILPACK'},
-            {id:'0030053', um:'UN', ds:'CAIXA PAPELAO TIPO 05 P/ COSM. 600 X 400 SPILPACK'},
-            {id:'0030066', um:'UN', ds:'CAIXA PAPELAO TIPO 06 P/ COSM. 572 X 372 X 390'},
-            {id:'0030084', um:'UN', ds:'CAIXA TIPO 07 KRAFT 592 X 392 X 240 SPILTAG'},
-            {id:'0030086', um:'UN', ds:'CAIXA TIPO 09 KRAFT 392 X 296 X 270 SPILTAG'},
-            {id:'0030101', um:'UN', ds:'CAIXA PAPELAO TIPO 14 P/COSM. 595 X 380 X 330'},
-            {id:'0060010', um:'UN', ds:'MANTA TERMICA 1 X 10 M'},
-            {id:'0070008', um:'UN', ds:'PALLET 1200 X 1000 FUMEGADO CE'},
-            {id:'0070015', um:'UN', ds:'PALLET PADRAO PBR 1200 X 1000 CE'}
+            {p: "Bag suspenso A + caixa", l: "Abastecimento", c: "1575", type: "PET"},
+            {p: "Bag suspenso B + caixa", l: "Abastecimento", c: "1575", type: "PET"},
+            {p: "Bag suspenso C + caixa", l: "Abastecimento", c: "1575", type: "PET"},
+            {p: "Bag suspenso D + caixa", l: "Abastecimento", c: "1575", type: "PET"},
+
+            {p: "Desumid. 01", l: "Sopro", c: "240", type: "PET"},
+            {p: "Desumid. 02", l: "Sopro", c: "480", type: "PET"},
+            {p: "Desumid. 03", l: "Sopro", c: "160", type: "PET"},
+            {p: "Desumid. 04", l: "Sopro", c: "320", type: "PET"},
+            {p: "Desumid. 05", l: "Sopro", c: "320", type: "PET"},
+
+            {p: "Desumid. 06", l: "Sopro", c: "160", type: "MIX"},
+            {p: "Desumid. 07", l: "Sopro", c: "160", type: "MIX"},
+            {p: "Desumid. 08", l: "Sopro", c: "160", type: "MIX"},
+            {p: "Desumid. 09", l: "Sopro", c: "160", type: "MIX"},
+            {p: "Desumid. 10", l: "Sopro", c: "160", type: "MIX"},
+            {p: "Desumid. 11", l: "Sopro", c: "160", type: "MIX"},
+            {p: "Desumid. 12", l: "Sopro", c: "160", type: "MIX"},
+            {p: "Desumid. 13", l: "Sopro", c: "640", type: "PET"},
+            {p: "Desumid. 14", l: "Sopro", c: "160", type: "MIX"},
+            {p: "Desumid. 16", l: "Sopro", c: "160", type: "MIX"},
+            {p: "Desumid. 17", l: "Sopro", c: "240", type: "PET"},
+            {p: "Desumid. 18", l: "Sopro", c: "480", type: "PET"},
+            {p: "Desumid. 19", l: "Sopro", c: "500", type: "PET"},
+
+            {p: "Caçamba 01", l: "Sopro", c: "Pesag.", type: "MIX"},
+            {p: "Caçamba 02", l: "Sopro", c: "Pesag.", type: "MIX"},
+            {p: "Caçamba 03", l: "Sopro", c: "Pesag.", type: "MIX"},
+            {p: "Caçamba 04", l: "Sopro", c: "Pesag.", type: "MIX"},
+            {p: "Caçamba 05", l: "Sopro", c: "Pesag.", type: "MIX"},
+            {p: "Caçamba 06", l: "Sopro", c: "Pesag.", type: "MIX"},
+
+            {p: "Bags PET VI 0,80", l: "Sopro", c: "Pesag.", type: "PET"},
+            {p: "Bags PCR 0T", l: "Sopro", c: "Pesag.", type: "0T"},
+            {p: "Bags PCR 10T", l: "Sopro", c: "Pesag.", type: "10T"},
+            {p: "Bags PET ACQUAMIX", l: "Sopro", c: "Pesag.", type: "ACQ"},
+            {p: "Bags VALGROUP PCR", l: "Sopro", c: "Pesag.", type: "VAL"},
+            {p: "Bags GLOBAL PET PCR", l: "Sopro", c: "Pesag.", type: "GLO"},
+
+            {p: "Desumid. 15", l: "Dinamo", c: "240", type: "MIX"},
+            {p: "Bags avulsos (Dinamo)", l: "Dinamo", c: "Pesag.", type: "MIX"}
+
         ];
 
-        const insumosDecoracaoGeral = [
-            {id:'0040033', um:'RL', ds:'FITA ADESIVA DE PAPEL CREPADO 68X50', calc:'Fita'},
-            {id:'0030069', um:'UN', ds:'CHAPA DE PAPELAO 1200 X 1000'},
-            {id:'0030015', um:'UN', ds:'CAIXA PAPELAO TIPO 01 P/ COSM. 600 X 400 X 337'},
-            {id:'0040005', um:'UN', ds:'SACO TIPO 01 P/ CAIXA DE COSM.'},
-            {id:'0030038', um:'UN', ds:'CAIXA PAPELAO TIPO 03 P/ COSM. 600 X 400'},
-            {id:'0040025', um:'UN', ds:'SACO TIPO 03 P/ CAIXA COSM. 107 X 110 X 0,0'},
-            {id:'0030052', um:'UN', ds:'CAIXA PAPELAO TIPO 04 P/COSM. 600X400X337 SPILPACK'},
-            {id:'0030053', um:'UN', ds:'CAIXA PAPELAO TIPO 05 P/ COSM. 600 X 400 SPILPACK'},
-            {id:'0030066', um:'UN', ds:'CAIXA PAPELAO TIPO 06 P/ COSM. 572 X 372 X 390'},
-            {id:'0030084', um:'UN', ds:'CAIXA TIPO 07 KRAFT 592 X 392 X 240 SPILTAG'},
-            {id:'0030086', um:'UN', ds:'CAIXA TIPO 09 KRAFT 392 X 296 X 270 SPILTAG'},
-            {id:'0030101', um:'UN', ds:'CAIXA PAPELAO TIPO 14 P/COSM. 595 X 380 X 330'},
-            {id:'0060010', um:'UN', ds:'MANTA TERMICA 1 X 10 M'},
-            {id:'0070008', um:'UN', ds:'PALLET 1200 X 1000 FUMEGADO CE'},
-            {id:'0070015', um:'UN', ds:'PALLET PADRAO PBR 1200 X 1000 CE'}
-        ];
 
-        const insumosDecoracaoSleeve = [
-            {id:'0040033', um:'RL', ds:'FITA ADESIVA DE PAPEL CREPADO 68X50', calc:'Fita'},
-            {id:'0040026', um:'UN', ds:'LAMINA COSM. 68 X 40 X 0,03 CM', calc:'Lamina Fina'},
-            {id:'0030069', um:'UN', ds:'CHAPA DE PAPELAO 1200 X 1000'}
-        ];
+        /* ============================================================
+           RENDERIZA TABELA
+        ============================================================ */
 
-        const insumosDinamoGeral = [
-            {id:'0040033', um:'RL', ds:'FITA ADESIVA DE PAPEL CREPADO 68X50', calc:'Fita'},
-            {id:'0040026', um:'UN', ds:'LAMINA COSM. 68 X 40 X 0,03 CM', calc:'Lamina Fina'},
-            {id:'0040023', um:'UN', ds:'LAMINA COSM. 41 X 59 X 0,13 CM', calc:'Lamina Grossa'},
-            {id:'0040055', um:'UN', ds:'LAMINA TNT GR15 68X40 10 G', calc:'Lamina TNT'},
-            {id:'0030069', um:'UN', ds:'CHAPA DE PAPELAO 1200 X 1000'},
-            {id:'0030057', um:'UN', ds:'CANTONEIRA 50 X 50 X 3 X 1050'},
-            {id:'0060037', um:'UN', ds:'CANTONEIRA 50 X 50 X 3 X1760'},
-            {id:'0030015', um:'UN', ds:'CAIXA PAPELAO TIPO 01 P/ COSM. 600 X 400 X 337'},
-            {id:'0040005', um:'UN', ds:'SACO TIPO 01 P/ CAIXA DE COSM.'},
-            {id:'0030038', um:'UN', ds:'CAIXA PAPELAO TIPO 03 P/ COSM. 600 X 400'},
-            {id:'0040025', um:'UN', ds:'SACO TIPO 03 P/ CAIXA COSM. 107 X 110 X 0,0'},
-            {id:'0030052', um:'UN', ds:'CAIXA PAPELAO TIPO 04 P/COSM. 600X400X337 SPILPACK'},
-            {id:'0030053', um:'UN', ds:'CAIXA PAPELAO TIPO 05 P/ COSM. 600 X 400 SPILPACK'},
-            {id:'0030066', um:'UN', ds:'CAIXA PAPELAO TIPO 06 P/ COSM. 572 X 372 X 390'},
-            {id:'0030084', um:'UN', ds:'CAIXA TIPO 07 KRAFT 592 X 392 X 240 SPILTAG'},
-            {id:'0030086', um:'UN', ds:'CAIXA TIPO 09 KRAFT 392 X 296 X 270 SPILTAG'},
-            {id:'0030101', um:'UN', ds:'CAIXA PAPELAO TIPO 14 P/COSM. 595 X 380 X 330'},
-            {id:'0060010', um:'UN', ds:'MANTA TERMICA 1 X 10 M'},
-            {id:'0070008', um:'UN', ds:'PALLET 1200 X 1000 FUMEGADO CE'},
-            {id:'0070015', um:'UN', ds:'PALLET PADRAO PBR 1200 X 1000 CE'},
-            {id:'0040076', um:'UN', ds:'DISCO POLEXAN R 87 MX25 87,00 X 1,50'},
-            {id:'0040077', um:'UN', ds:'DISCO DE POLEXAN P/ TAMPA R 63'}
-        ];
+        function render() {
 
-        const resinasDinamoFixas = [
-            {id:'0010035', ds:'RESINA POLIPROPILENO PP CP 241'},
-            {id:'0010036', ds:'RESINA POLIPROPILENO PP FT 120'},
-            {id:'0010039', ds:'RESINA POLIPROPILENO PP RANDON RP 340R'},
-            {id:'0010042', ds:'RESINA POLIPROPILENO PP RT 100'},
-            {id:'0010043', ds:'RESINA PELBD IC32'},
-            {id:'0010073', ds:'RESINA TPE 7101/A80CO'},
-            {id:'0014256', ds:'RESINA PEAD GF 4950'}
-        ];
+            const body = document.getElementById('table-body');
 
-        function autenticar() { 
-            const u = document.getElementById('user').value.trim().toLowerCase(); 
-            const p = document.getElementById('pass').value.trim(); 
-            if (configSetores[u] && configSetores[u].pass === p) { 
-                setorLogado = u;
-                document.getElementById('login-screen').style.display = 'none'; 
-                document.getElementById('app-container').style.display = 'block'; 
-                document.getElementById('label-setor').innerText = "PAINEL DE INVENTÁRIO - " + configSetores[u].label;
-                
-                if (u === "engprocessos") {
-                    document.getElementById('operator-panel').style.display = 'none';
-                    document.getElementById('linha-responsavel').style.display = 'none';
-                    document.getElementById('btn-salvar').style.display = 'none';
-                    document.getElementById('engineering-panel').style.display = 'block';
-                    carregarDadosDash();
+            body.innerHTML = "";
+
+            itens.forEach((it, i) => {
+
+                const tr = document.createElement('tr');
+
+                const isMix = it.type === "MIX";
+
+                let seletorHtml = "";
+
+                if (isMix) {
+
+                    seletorHtml = `
+                        <select
+                            id="sel-${i}"
+                            class="select-resina"
+                            onchange="tratarMudancaResina(this, ${i});calc()"
+                        >
+                            <option value="">
+                                -- Selecione a Resina --
+                            </option>
+
+                            <option value="0010048">
+                                0010048 - PCR 0T
+                            </option>
+
+                            <option value="0010030">
+                                0010030 - PCR 10T
+                            </option>
+
+                            <option value="0010023">
+                                0010023 - ACQUAMIX
+                            </option>
+
+                            <option value="0010066">
+                                0010066 - VALGROUP
+                            </option>
+
+                            <option value="0010080">
+                                0010080 - PCR GLOBAL
+                            </option>
+
+                        </select>
+                    `;
+
                 } else {
-                    document.getElementById('operator-panel').style.display = 'block';
-                    document.getElementById('linha-responsavel').style.display = 'table-row';
-                    document.getElementById('btn-salvar').style.display = 'block';
-                    document.getElementById('engineering-panel').style.display = 'none';
-                    gerarEstrutura(); 
-                }
-            } else { document.getElementById('error-msg').style.display = 'block'; } 
-        }
 
-        function gerarEstrutura() {
-            const isMaster = setorLogado === "master";
-            const limitePA = configSetores[setorLogado].linhasPA || 0;
+                    let txtFixo = "";
 
-            // MASTER: mostra somente o bloco Registro de Master
-            document.getElementById('bloco-papi-geral').style.display = isMaster ? 'none' : 'block';
-            document.getElementById('bloco-insumos-geral').style.display = isMaster ? 'none' : 'block';
-            document.getElementById('bloco-papi-sleeve').style.display = (setorLogado === "decoracao") ? 'block' : 'none';
-            document.getElementById('bloco-insumos-sleeve').style.display = (setorLogado === "decoracao") ? 'block' : 'none';
-            document.getElementById('bloco-resinas-dinamo').style.display = (setorLogado === "dinamo") ? 'block' : 'none';
-            document.getElementById('bloco-master-dinamo').style.display = (setorLogado === "dinamo" || isMaster) ? 'block' : 'none';
+                    if (it.type === "PET")
+                        txtFixo = "0010006 - PET";
 
-            if (!isMaster) {
-                const cp = document.getElementById('corpo-papi'); cp.innerHTML = "";
-                for (let i = 0; i < limitePA; i++) {
-                    let tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td><input class="cell-input" id="papi-lido-${i}" oninput="bipe(this, ${i}, 'papi')"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="papi-mat-${i}" readonly tabindex="-1"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="papi-ds-${i}" value="**********************" readonly tabindex="-1"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="papi-lote-${i}" readonly tabindex="-1"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="papi-um-${i}" value="CX" readonly tabindex="-1"></td>
-                        <td><input class="cell-input" type="number" step="any" id="papi-qtd-${i}" onkeydown="handleEnter(event, 'papi', ${i})"></td>
+                    else if (it.type === "0T")
+                        txtFixo = "0010048 - 0T";
+
+                    else if (it.type === "10T")
+                        txtFixo = "0010030 - 10T";
+
+                    else if (it.type === "ACQ")
+                        txtFixo = "0010023 - ACQ";
+
+                    else if (it.type === "VAL")
+                        txtFixo = "0010066 - VAL";
+
+                    else if (it.type === "GLO")
+                        txtFixo = "0010080 - GLO";
+
+                    seletorHtml = `
+                        <span style="font-size:11px; font-weight:bold;">
+                            ${txtFixo}
+                        </span>
                     `;
-                    cp.appendChild(tr);
                 }
 
-                const ci = document.getElementById('corpo-insumos'); ci.innerHTML = "";
-                let listaInsumos = insumosInjeSopro;
-                if (setorLogado === "decoracao") listaInsumos = insumosDecoracaoGeral;
-                if (setorLogado === "dinamo") listaInsumos = insumosDinamoGeral;
 
-                listaInsumos.forEach((it, i) => {
-                    let tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td><input class="cell-input cell-readonly text-center" value="**********" readonly tabindex="-1"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="ins-mat-${i}" value="${it.id}" readonly tabindex="-1"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="ins-ds-${i}" value="${it.ds}" readonly tabindex="-1"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="ins-lote-${i}" value="******" readonly tabindex="-1"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="ins-um-${i}" value="${it.um}" readonly tabindex="-1"></td>
+                tr.innerHTML = `
+
+                    <td style="text-align:left; font-weight:bold;">
+                        ${it.p}
+                    </td>
+
+                    <td>
+                        ${it.l}
+                    </td>
+
+                    <td>
+                        ${it.c}
+                    </td>
+
+                    <td>
+                        <input
+                            type="number"
+                            class="peso editable"
+                            id="peso-${i}"
+                            oninput="calc()"
+                            placeholder=""
+                        >
+                    </td>
+
+                    <td>
+                        ${seletorHtml}
+                    </td>
+
+                    ${[25,50,75,100].map(v => `
                         <td>
-                            <input class="cell-input" type="number" step="any" id="ins-qtd-${i}" placeholder="${it.calc ? 'calculadora...' : ''}" onkeydown="handleEnter(event, 'ins', ${i})">
-                            ${it.calc ? `<button class="btn-calc" onclick="abrirCalc(${i},'${it.calc}','ins')">🧮</button>` : ''}
+                            <input
+                                type="checkbox"
+                                name="m${i}"
+                                id="chk-${i}-${v}"
+                                onclick="unck(this, ${i});calc()"
+                                data-val="${v}"
+                                ${!isMix ? 'disabled' : ''}
+                            >
                         </td>
-                    `;
-                    ci.appendChild(tr);
-                });
-            }
+                    `).join('')}
 
-            if (setorLogado === "decoracao") {
-                const cps = document.getElementById('corpo-papi-sleeve'); cps.innerHTML = "";
-                for (let i = 0; i < 7; i++) {
-                    let tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td><input class="cell-input" id="slvpapi-lido-${i}" oninput="bipe(this, ${i}, 'slvpapi')"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="slvpapi-mat-${i}" readonly tabindex="-1"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="slvpapi-ds-${i}" value="**********************" readonly tabindex="-1"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="slvpapi-lote-${i}" readonly tabindex="-1"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="slvpapi-um-${i}" value="CX" readonly tabindex="-1"></td>
-                        <td><input class="cell-input" type="number" step="any" id="slvpapi-qtd-${i}" onkeydown="handleEnter(event, 'slvpapi', ${i})"></td>
-                    `;
-                    cps.appendChild(tr);
-                }
+                    <td class="rv res-val">0.0</td>
+                    <td class="r0 res-val">0.0</td>
+                    <td class="r10 res-val">0.0</td>
+                    <td class="racq res-val">0.0</td>
+                    <td class="rglo res-val">0.0</td>
+                    <td class="rval res-val">0.0</td>
 
-                const cis = document.getElementById('corpo-insumos-sleeve'); cis.innerHTML = "";
-                insumosDecoracaoSleeve.forEach((it, i) => {
-                    let tr = document.createElement('tr');
-                    let temCalculadora = !!it.calc;
-                    tr.innerHTML = `
-                        <td><input class="cell-input cell-readonly text-center" value="**********" readonly tabindex="-1"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="slvins-mat-${i}" value="${it.id}" readonly tabindex="-1"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="slvins-ds-${i}" value="${it.ds}" readonly tabindex="-1"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="slvins-lote-${i}" value="******" readonly tabindex="-1"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="slvins-um-${i}" value="${it.um}" readonly tabindex="-1"></td>
-                        <td>
-                            <input class="cell-input" type="number" step="any" id="slvins-qtd-${i}" placeholder="${temCalculadora ? 'calculadora...' : ''}" onkeydown="handleEnter(event, 'slvins', ${i})">
-                            ${temCalculadora ? `<button class="btn-calc" onclick="abrirCalc(${i},'${it.calc}','slvins')">🧮</button>` : ''}
-                        </td>
-                    `;
-                    cis.appendChild(tr);
-                });
-            }
+                `;
 
-            if (setorLogado === "dinamo") {
-                const cr = document.getElementById('corpo-resinas-dinamo'); cr.innerHTML = "";
-                resinasDinamoFixas.forEach((it, i) => {
-                    let tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td><input class="cell-input cell-readonly text-center" value="**********" readonly tabindex="-1"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="res-mat-${i}" value="${it.id}" readonly tabindex="-1"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="res-ds-${i}" value="${it.ds}" readonly tabindex="-1"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="res-lote-${i}" value="******" readonly tabindex="-1"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="res-um-${i}" value="KG" readonly tabindex="-1"></td>
-                        <td><input class="cell-input" type="number" step="any" id="res-qtd-${i}" onkeydown="handleEnter(event, 'res', ${i})"></td>
-                    `;
-                    cr.appendChild(tr);
-                });
-            }
+                body.appendChild(tr);
 
-            if (setorLogado === "dinamo" || isMaster) {
-                const cm = document.getElementById('corpo-master-dinamo'); cm.innerHTML = "";
-                const limiteMaster = isMaster ? 80 : 10;
-                for (let i = 0; i < limiteMaster; i++) {
-                    let tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td><input class="cell-input" id="mst-lido-${i}" oninput="bipe(this, ${i}, 'mst')" onkeydown="handleCodigoKeydown(event, ${i})"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="mst-mat-${i}" readonly tabindex="-1"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="mst-ds-${i}" value="**********************" readonly tabindex="-1"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="mst-lote-${i}" readonly tabindex="-1"></td>
-                        <td><input class="cell-input cell-readonly text-center" id="mst-um-${i}" value="KG" readonly tabindex="-1"></td>
-                        <td><input class="cell-input" type="number" step="any" id="mst-qtd-${i}" onkeydown="handleEnter(event, 'mst', ${i})"></td>
-                    `;
-                    cm.appendChild(tr);
-                }
-            }
-        }
-
-        function separarCodigoLote(valor) {
-            const texto = (valor || "").trim();
-            const partes = texto.split(/[}|]/);
-            if (partes.length < 2) return null;
-            return { codigo: partes[0].trim(), lote: partes.slice(1).join('}').trim() };
-        }
-
-        function bipe(el, i, prefix) {
-            const qtdField = document.getElementById(`${prefix}-qtd-${i}`);
-            const matField = document.getElementById(`${prefix}-mat-${i}`);
-            const loteField = document.getElementById(`${prefix}-lote-${i}`);
-
-            if (!el.value.trim()) {
-                if (matField) matField.value = "";
-                if (loteField) loteField.value = "";
-                if (qtdField) qtdField.value = "";
-                return;
-            }
-
-            const separado = separarCodigoLote(el.value);
-            if (!separado) return;
-
-            if (matField) matField.value = separado.codigo;
-            if (loteField) loteField.value = separado.lote;
-
-            processandoBipe = true;
-            setTimeout(() => {
-                if (qtdField) {
-                    qtdField.value = "";
-                    qtdField.focus();
-                }
-                processandoBipe = false;
-            }, 80);
-        }
-
-        function handleCodigoKeydown(e, i) {
-            if ((e.key === 'Enter' || e.key === 'Tab') && setorLogado === 'master') {
-                const separado = separarCodigoLote(e.target.value);
-                if (separado) {
-                    e.preventDefault();
-                    document.getElementById(`mst-mat-${i}`).value = separado.codigo;
-                    document.getElementById(`mst-lote-${i}`).value = separado.lote;
-                    const qtd = document.getElementById(`mst-qtd-${i}`);
-                    if (qtd) qtd.focus();
-                }
-            }
-        }
-
-        function handleEnter(e, prefix, i) { 
-            if (processandoBipe && e.key === 'Enter') { e.preventDefault(); return; }
-            if (e.key === 'Enter') { 
-                e.preventDefault(); 
-                
-                if (prefix === 'papi') {
-                    if (i === configSetores[setorLogado].linhasPA - 1) {
-                        let firstInsQtd = document.getElementById('ins-qtd-0');
-                        if (firstInsQtd) firstInsQtd.focus();
-                    } else {
-                        let nextLido = document.getElementById(`papi-lido-${i + 1}`);
-                        if (nextLido) nextLido.focus();
-                    }
-                } 
-                else if (prefix === 'ins') {
-                    let totalIns = (setorLogado === "injesop") ? insumosInjeSopro.length : ((setorLogado === "decoracao") ? insumosDecoracaoGeral.length : insumosDinamoGeral.length);
-                    if (i === totalIns - 1) {
-                        if (setorLogado === "decoracao") {
-                            let firstSlvLido = document.getElementById('slvpapi-lido-0');
-                            if (firstSlvLido) firstSlvLido.focus();
-                        } else if (setorLogado === "dinamo") {
-                            let firstResQtd = document.getElementById('res-qtd-0');
-                            if (firstResQtd) firstResQtd.focus();
-                        }
-                    } else {
-                        let nextQtd = document.getElementById(`ins-qtd-${i + 1}`);
-                        if (nextQtd) nextQtd.focus();
-                    }
-                }
-                else if (prefix === 'slvpapi') {
-                    if (i === 6) {
-                        let firstSlvInsQtd = document.getElementById('slvins-qtd-0');
-                        if (firstSlvInsQtd) firstSlvInsQtd.focus();
-                    } else {
-                        let nextSlvLido = document.getElementById(`slvpapi-lido-${i + 1}`);
-                        if (nextSlvLido) nextSlvLido.focus();
-                    }
-                }
-                else if (prefix === 'slvins') {
-                    let nextSlvInsQtd = document.getElementById(`slvins-qtd-${i + 1}`);
-                    if (nextSlvInsQtd) nextSlvInsQtd.focus();
-                }
-                else if (prefix === 'res') {
-                    if (i === resinasDinamoFixas.length - 1) {
-                        let firstMstLido = document.getElementById('mst-lido-0');
-                        if (firstMstLido) firstMstLido.focus();
-                    } else {
-                        let nextResQtd = document.getElementById(`res-qtd-${i + 1}`);
-                        if (nextResQtd) nextResQtd.focus();
-                    }
-                }
-                else if (prefix === 'mst') {
-                    let nextMstLido = document.getElementById(`mst-lido-${i + 1}`);
-                    if (nextMstLido) nextMstLido.focus();
-                }
-            } 
-        }
-
-        function abrirCalc(i, t, tab) { lAlvo=i; tAlvo=t; tabAlvo=tab; document.getElementById('p-t').value = ""; document.getElementById('q-m').value = ""; document.getElementById('modalCalc').style.display='block'; document.getElementById('q-m').style.display = t==='Fita'?'block':'none'; }
-        function fecharModais() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
-        function tentarSair() { document.getElementById('modalSairPerg').style.display = 'block'; }
-        function logoutDireto() { location.reload(); }
-
-        function aplicarCalculo() { 
-            const p = parseFloat(document.getElementById('p-t').value) || 0; 
-            const m = parseFloat(document.getElementById('q-m').value) || 0; 
-            let res = 0; 
-            if(tAlvo === 'Fita') { 
-                res = (((p - (m * 30)) * 50) / 270) / 50; 
-                document.getElementById(`${tabAlvo}-qtd-${lAlvo}`).value = res.toFixed(1); 
-            } else { 
-                let divisor = 1;
-                if (tAlvo === 'Lamina Fina') divisor = 8;
-                else if (tAlvo === 'Lamina Grossa') divisor = 28;
-                else if (tAlvo === 'Lamina TNT') divisor = 4;
-                res = Math.ceil(p / divisor); 
-                document.getElementById(`${tabAlvo}-qtd-${lAlvo}`).value = res; 
-            } 
-            fecharModais(); 
-            document.getElementById(`${tabAlvo}-qtd-${lAlvo}`).focus();
-        }
-
-        function carregarDadosDash() {
-            const tbody = document.getElementById('corpo-dash');
-            tbody.innerHTML = `<tr><td colspan="8" style="padding:20px; color:#666;">Buscando dados atualizados no Google Sheets...</td></tr>`;
-
-            fetch(urlPlanilha, {
-                method: "GET",
-                redirect: "follow"
-            })
-            .then(response => {
-                if (!response.ok) throw new Error("Erro na rede");
-                return response.json();
-            })
-            .then(data => {
-                dadosGlobaisDash = data;
-                renderizarTabelaDash();
-            })
-            .catch(error => {
-                tbody.innerHTML = `<tr><td colspan="8" style="padding:20px; color:red;">Erro de comunicação com a planilha!</td></tr>`;
-            });
-        }
-
-        function renderizarTabelaDash() {
-            const fSetor = document.getElementById('filtro-setor').value.toUpperCase().trim();
-            const fBusca = document.getElementById('busca-dash').value.toLowerCase().trim();
-            const tbody = document.getElementById('corpo-dash');
-            tbody.innerHTML = "";
-
-            let totalItens = 0;
-            let linesFiltradas = 0;
-
-            dadosGlobaisDash.forEach(row => {
-                let dataFormata = new Date(row[0]).toLocaleString();
-                let setor = (row[1] || "").toUpperCase().trim();
-                if (setor === "INVENTÁRIO DE MASTER") setor = "MASTER";
-                let resp = (row[2] || "").toLowerCase().trim();
-                let codigo = (row[3] || "").toString().toLowerCase().trim();
-                let desc = (row[4] || "").toLowerCase().trim();
-                let lote = row[5] || "";
-                let um = row[6] || "";
-                let qtd = parseFloat(row[7]) || 0;
-
-                let bateSetor = (fSetor === "TODOS" || setor === fSetor);
-                let bateBusca = (fBusca === "" || resp.includes(fBusca) || codigo.includes(fBusca) || desc.includes(fBusca));
-
-                if (bateSetor && bateBusca) {
-                    linesFiltradas++;
-                    totalItens += qtd;
-
-                    tbody.innerHTML += `
-                        <tr>
-                            <td style="padding:6px;">${dataFormata}</td>
-                            <td>${setor}</td>
-                            <td>${row[2] || ""}</td>
-                            <td>${row[3] || ""}</td>
-                            <td>${row[4] || ""}</td>
-                            <td>${lote}</td>
-                            <td>${um}</td>
-                            <td>${qtd}</td>
-                        </tr>
-                    `;
-                }
             });
 
-            document.getElementById('dash-ops').innerText = linesFiltradas;
-            document.getElementById('dash-itens').innerText = totalItens.toLocaleString();
-
-            if (linesFiltradas === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" style="padding:20px; color:#999;">Nenhum registro encontrado para o filtro selecionado.</td></tr>`;
-            }
         }
 
-        function numeroQuantidade(valor) {
-            const normalizado = String(valor ?? '').trim().replace(',', '.');
-            const n = Number(normalizado);
-            return Number.isFinite(n) ? n : 0;
+
+        /* ============================================================
+           MUDANÇA DE RESINA
+        ============================================================ */
+
+        function tratarMudancaResina(selectEl, index) {
+
+            const ehAcquamix =
+                selectEl.value === "0010023";
+
+            [25,50,75,100].forEach(v => {
+
+                const chk =
+                    document.getElementById(`chk-${index}-${v}`);
+
+                if (chk && ehAcquamix) {
+
+                    chk.checked = false;
+                    chk.disabled = true;
+
+                } else if (chk) {
+
+                    chk.disabled = false;
+
+                }
+
+            });
+
         }
 
-        function validarResponsavel() {
-            const resp = document.getElementById('resp-name').value.trim();
-            if (!resp) { document.getElementById('modalAvisoResp').style.display = 'block'; return; }
 
-            const btnSalvar = document.getElementById('btn-salvar');
-            btnSalvar.innerText = "ENVIANDO... AGUARDE";
-            btnSalvar.disabled = true;
+        /* ============================================================
+           CÁLCULO
+        ============================================================ */
 
-            let dados = { setor: configSetores[setorLogado].label, responsavel: resp, itens: [] };
+        function calc() {
 
-            if (setorLogado === "master") {
-                const consolidados = new Map();
+            let tV = 0;
+            let t0 = 0;
+            let t10 = 0;
+            let tAcq = 0;
+            let tGlo = 0;
+            let tVal = 0;
 
-                for (let i = 0; i < 80; i++) {
-                    const campoLido = document.getElementById(`mst-lido-${i}`);
-                    const campoQtd = document.getElementById(`mst-qtd-${i}`);
-                    if (!campoLido || !campoQtd) continue;
 
-                    const leitura = separarCodigoLote(campoLido.value);
-                    const qtd = numeroQuantidade(campoQtd.value);
-                    if (!leitura || !leitura.codigo || !leitura.lote || qtd <= 0) continue;
+            document
+                .querySelectorAll('#table-body tr')
+                .forEach((tr, i) => {
 
-                    const chave = `${leitura.codigo}|||${leitura.lote}`;
-                    if (!consolidados.has(chave)) {
-                        consolidados.set(chave, {
-                            codigo: leitura.codigo,
-                            descricao: "**********************",
-                            lote: leitura.lote,
-                            um: "KG",
-                            qtd: 0
-                        });
+                    const p =
+                        parseFloat(
+                            tr.querySelector('.peso').value
+                        ) || 0;
+
+                    const chk =
+                        tr.querySelector('input:checked');
+
+                    const select =
+                        tr.querySelector('.select-resina');
+
+
+                    let v = 0;
+                    let p0 = 0;
+                    let p10 = 0;
+                    let acq = 0;
+                    let glo = 0;
+                    let valg = 0;
+
+
+                    if (itens[i].type === "PET") {
+
+                        v = p;
+
                     }
-                    consolidados.get(chave).qtd += qtd;
-                }
 
-                dados.itens = Array.from(consolidados.values()).map(item => ({
-                    ...item,
-                    qtd: Number(item.qtd.toFixed(6))
-                }));
-            } else {
-                const limitePA = configSetores[setorLogado].linhasPA;
+                    else if (itens[i].type === "0T") {
 
-                for (let i = 0; i < limitePA; i++) {
-                    let codMat = document.getElementById(`papi-mat-${i}`).value;
-                    let dsMat = document.getElementById(`papi-ds-${i}`).value;
-                    let loteMat = document.getElementById(`papi-lote-${i}`).value;
-                    let umMat = document.getElementById(`papi-um-${i}`).value;
-                    let qtdMat = document.getElementById(`papi-qtd-${i}`).value;
-                    if (qtdMat > 0 && codMat) {
-                        dados.itens.push({ codigo: codMat, descricao: dsMat, lote: loteMat, um: umMat, qtd: qtdMat });
+                        p0 = p;
+
                     }
-                }
 
-                let listaInsumos = insumosInjeSopro;
-                if (setorLogado === "decoracao") listaInsumos = insumosDecoracaoGeral;
-                if (setorLogado === "dinamo") listaInsumos = insumosDinamoGeral;
+                    else if (itens[i].type === "10T") {
 
-                listaInsumos.forEach((it, i) => {
-                    let qtdIns = document.getElementById('ins-qtd-' + i).value;
-                    if (qtdIns > 0) {
-                        dados.itens.push({ codigo: it.id, descricao: it.ds, lote: "N/A", um: it.um, qtd: qtdIns });
+                        p10 = p;
+
                     }
+
+                    else if (itens[i].type === "ACQ") {
+
+                        acq = p;
+
+                    }
+
+                    else if (itens[i].type === "GLO") {
+
+                        glo = p;
+
+                    }
+
+                    else if (itens[i].type === "VAL") {
+
+                        valg = p;
+
+                    }
+
+                    else if (itens[i].type === "MIX") {
+
+                        if (select && !select.value) {
+
+                            v = p;
+
+                        }
+
+                        else if (
+                            select &&
+                            select.value === "0010023"
+                        ) {
+
+                            acq = p;
+
+                        }
+
+                        else if (chk) {
+
+                            let fator =
+                                parseInt(chk.dataset.val) / 100;
+
+                            let qMix =
+                                p * fator;
+
+                            v =
+                                p - qMix;
+
+
+                            if (
+                                select.value === "0010048"
+                            ) {
+
+                                p0 = qMix;
+
+                            }
+
+                            else if (
+                                select.value === "0010030"
+                            ) {
+
+                                p10 = qMix;
+
+                            }
+
+                            else if (
+                                select.value === "0010066"
+                            ) {
+
+                                valg = qMix;
+
+                            }
+
+                            else if (
+                                select.value === "0010080"
+                            ) {
+
+                                glo = qMix;
+
+                            }
+
+                        }
+
+                        else {
+
+                            v = p;
+
+                        }
+
+                    }
+
+
+                    tr.querySelector('.rv').innerText =
+                        v.toFixed(1);
+
+                    tr.querySelector('.r0').innerText =
+                        p0.toFixed(1);
+
+                    tr.querySelector('.r10').innerText =
+                        p10.toFixed(1);
+
+                    tr.querySelector('.racq').innerText =
+                        acq.toFixed(1);
+
+                    tr.querySelector('.rglo').innerText =
+                        valg.toFixed(1);
+
+                    tr.querySelector('.rval').innerText =
+                        glo.toFixed(1);
+
+
+                    tV += v;
+                    t0 += p0;
+                    t10 += p10;
+                    tAcq += acq;
+                    tGlo += valg;
+                    tVal += glo;
+
                 });
 
-                if (setorLogado === "decoracao") {
-                    for (let i = 0; i < 7; i++) {
-                        let codMat = document.getElementById(`slvpapi-mat-${i}`).value;
-                        let dsMat = document.getElementById(`slvpapi-ds-${i}`).value;
-                        let loteMat = document.getElementById(`slvpapi-lote-${i}`).value;
-                        let umMat = document.getElementById(`slvpapi-um-${i}`).value;
-                        let qtdMat = document.getElementById(`slvpapi-qtd-${i}`).value;
-                        if (qtdMat > 0 && codMat) {
-                            dados.itens.push({ codigo: codMat, descricao: dsMat, lote: loteMat, um: umMat, qtd: qtdMat });
-                        }
-                    }
-                    insumosDecoracaoSleeve.forEach((it, i) => {
-                        let qtdIns = document.getElementById(`slvins-qtd-${i}`).value;
-                        if (qtdIns > 0) {
-                            dados.itens.push({ codigo: it.id, descricao: it.ds, lote: "N/A", um: it.um, qtd: qtdIns });
-                        }
-                    });
+
+            document.getElementById('tot_v').innerText =
+                document.getElementById('som_v').innerText =
+                tV.toFixed(1);
+
+            document.getElementById('tot_0t').innerText =
+                document.getElementById('som_0t').innerText =
+                t0.toFixed(1);
+
+            document.getElementById('tot_10t').innerText =
+                document.getElementById('som_10t').innerText =
+                t10.toFixed(1);
+
+            document.getElementById('tot_acq').innerText =
+                document.getElementById('som_acq').innerText =
+                tAcq.toFixed(1);
+
+            document.getElementById('tot_glo').innerText =
+                document.getElementById('som_glo').innerText =
+                tGlo.toFixed(1);
+
+            document.getElementById('tot_val').innerText =
+                document.getElementById('som_val').innerText =
+                tVal.toFixed(1);
+
+
+            /* =========================
+               SALDOS SISTEMA
+            ========================= */
+
+            const sysV =
+                parseFloat(
+                    document.getElementById('sys_v').value
+                ) || 0;
+
+            const sys0 =
+                parseFloat(
+                    document.getElementById('sys_0t').value
+                ) || 0;
+
+            const sys10 =
+                parseFloat(
+                    document.getElementById('sys_10t').value
+                ) || 0;
+
+            const sysAcq =
+                parseFloat(
+                    document.getElementById('sys_acq').value
+                ) || 0;
+
+            const sysGlo =
+                parseFloat(
+                    document.getElementById('sys_glo').value
+                ) || 0;
+
+            const sysVal =
+                parseFloat(
+                    document.getElementById('sys_val').value
+                ) || 0;
+
+
+            /* =========================
+               DIFERENÇAS
+            ========================= */
+
+            const dV = tV - sysV;
+            const d0 = t0 - sys0;
+            const d10 = t10 - sys10;
+            const dAcq = tAcq - sysAcq;
+            const dGlo = tGlo - sysGlo;
+            const dVal = tVal - sysVal;
+
+
+            const elDifV =
+                document.getElementById('dif_v');
+
+            const elDif0 =
+                document.getElementById('dif_0t');
+
+            const elDif10 =
+                document.getElementById('dif_10t');
+
+            const elDifAcq =
+                document.getElementById('dif_acq');
+
+            const elDifGlo =
+                document.getElementById('dif_glo');
+
+            const elDifVal =
+                document.getElementById('dif_val');
+
+
+            elDifV.innerText = dV.toFixed(1);
+            elDif0.innerText = d0.toFixed(1);
+            elDif10.innerText = d10.toFixed(1);
+            elDifAcq.innerText = dAcq.toFixed(1);
+            elDifGlo.innerText = dGlo.toFixed(1);
+            elDifVal.innerText = dVal.toFixed(1);
+
+
+            /* =========================
+               CORES DAS DIFERENÇAS
+            ========================= */
+
+            const listaDifs = [
+
+                { el: elDifV, val: dV },
+                { el: elDif0, val: d0 },
+                { el: elDif10, val: d10 },
+                { el: elDifAcq, val: dAcq },
+                { el: elDifGlo, val: dGlo },
+                { el: elDifVal, val: dVal }
+
+            ];
+
+
+            listaDifs.forEach(item => {
+
+                if (item.val < 0) {
+
+                    item.el.style.color =
+                        '#a51c30';
+
                 }
 
-                if (setorLogado === "dinamo") {
-                    resinasDinamoFixas.forEach((it, i) => {
-                        let qtdRes = document.getElementById(`res-qtd-${i}`).value;
-                        if (qtdRes > 0) {
-                            dados.itens.push({ codigo: it.id, descricao: it.ds, lote: "N/A", um: "KG", qtd: qtdRes });
-                        }
-                    });
-                    for (let i = 0; i < 10; i++) {
-                        let codMat = document.getElementById(`mst-mat-${i}`).value;
-                        let dsMat = document.getElementById(`mst-ds-${i}`).value;
-                        let loteMat = document.getElementById(`mst-lote-${i}`).value;
-                        let umMat = document.getElementById(`mst-um-${i}`).value;
-                        let qtdMat = document.getElementById(`mst-qtd-${i}`).value;
-                        if (qtdMat > 0 && codMat) {
-                            dados.itens.push({ codigo: codMat, descricao: dsMat, lote: loteMat, um: umMat, qtd: qtdMat });
-                        }
-                    }
+                else if (item.val > 0) {
+
+                    item.el.style.color =
+                        '#28a745';
+
                 }
+
+                else {
+
+                    item.el.style.color = '';
+
+                }
+
+            });
+
+        }
+
+
+        /* ============================================================
+           CHECKBOX
+        ============================================================ */
+
+        function unck(el, index) {
+
+            document
+                .getElementsByName(el.name)
+                .forEach(c => {
+
+                    if (c !== el) {
+
+                        c.checked = false;
+
+                    }
+
+                });
+
+        }
+
+
+        /* ============================================================
+           LOGIN
+        ============================================================ */
+
+        function validarAcesso() {
+
+            const u =
+                document.getElementById('user_in').value;
+
+            const p =
+                document.getElementById('pass_in').value;
+
+
+            if (
+                u === "producao" &&
+                p === "Spil@2026"
+            ) {
+
+                document.getElementById('login-screen')
+                    .style.display = 'none';
+
+                document.getElementById('app-content')
+                    .style.display = 'block';
+
+
+                render();
+
+
+                setInterval(() => {
+
+                    document.getElementById('current-time')
+                        .innerText =
+                        new Date().toLocaleString();
+
+                }, 1000);
+
             }
 
-            if (dados.itens.length === 0) {
-                alert("Preencha ao menos uma linha válida antes de salvar!");
-                btnSalvar.innerText = "SALVAR INVENTÁRIO";
-                btnSalvar.disabled = false;
+            else {
+
+                mostrarAlertaCustomizado(
+                    "Acesso Negado!"
+                );
+
+            }
+
+        }
+
+
+        /* ============================================================
+           ALERTA PERSONALIZADO
+        ============================================================ */
+
+        function mostrarAlertaCustomizado(msg) {
+
+            const modal =
+                document.getElementById('custom-alert');
+
+
+            document.getElementById('alert-title')
+                .innerText = "ATENÇÃO!";
+
+
+            document.getElementById('alert-msg')
+                .innerText = msg;
+
+
+            document.getElementById('alert-btns')
+                .innerHTML = `
+
+                    <button
+                        class="btn-alert-ok"
+                        onclick="
+                            document.getElementById('custom-alert').style.display='none'
+                        "
+                    >
+                        OK
+                    </button>
+
+                `;
+
+
+            modal.style.display = 'flex';
+
+        }
+
+
+        /* ============================================================
+           LIMPAR TUDO
+        ============================================================ */
+
+        function confirmarLimpeza() {
+
+            document.getElementById('alert-msg')
+                .innerText =
+                "Deseja realmente limpar todos os dados?";
+
+
+            document.getElementById('alert-btns')
+                .innerHTML = `
+
+                    <button
+                        onclick="limparApenasDados()"
+                        class="btn-alert-ok"
+                    >
+                        SIM
+                    </button>
+
+                    <button
+                        onclick="
+                            document.getElementById('custom-alert').style.display='none'
+                        "
+                        style="
+                            padding:12px;
+                            border:none;
+                            border-radius:5px;
+                            cursor:pointer;
+                            margin-left:5px;
+                        "
+                    >
+                        NÃO
+                    </button>
+
+                `;
+
+
+            document.getElementById('custom-alert')
+                .style.display = 'flex';
+
+        }
+
+
+        function limparApenasDados() {
+
+            /* Limpa pesos */
+            document
+                .querySelectorAll('#table-body .peso')
+                .forEach(input => {
+
+                    input.value = '';
+
+                });
+
+
+            /* Limpa checkboxes */
+            document
+                .querySelectorAll(
+                    '#table-body input[type="checkbox"]'
+                )
+                .forEach(chk => {
+
+                    chk.checked = false;
+
+                });
+
+
+            /* Limpa seletores */
+            document
+                .querySelectorAll(
+                    '#table-body .select-resina'
+                )
+                .forEach(select => {
+
+                    select.value = '';
+
+                    /* Reativa checkboxes do MIX */
+                    const index =
+                        select.id.split('-')[1];
+
+                    [25,50,75,100].forEach(v => {
+
+                        const chk =
+                            document.getElementById(
+                                `chk-${index}-${v}`
+                            );
+
+                        if (chk) {
+
+                            chk.disabled = false;
+
+                        }
+
+                    });
+
+                });
+
+
+            /* Limpa saldos sistema */
+            document.getElementById('sys_v').value = '';
+            document.getElementById('sys_0t').value = '';
+            document.getElementById('sys_10t').value = '';
+            document.getElementById('sys_acq').value = '';
+            document.getElementById('sys_glo').value = '';
+            document.getElementById('sys_val').value = '';
+
+
+            /* Limpa responsável */
+            document.getElementById('resp').value = '';
+
+
+            /* Recalcula */
+            calc();
+
+
+            /* Fecha alerta */
+            document.getElementById('custom-alert')
+                .style.display = 'none';
+
+        }
+
+
+        /* ============================================================
+           ENVIO DO E-MAIL
+           
+           TRAVAS:
+           1 - Responsável obrigatório
+           2 - Todos os saldos do SISTEMA obrigatórios
+           3 - Todos os pontos de CONTAGEM obrigatórios
+           
+           IMPORTANTE:
+           O valor 0 É ACEITO.
+        ============================================================ */
+
+        function enviarEmail() {
+
+            /* ========================================================
+               1. RESPONSÁVEL
+            ======================================================== */
+
+            const resp =
+                document.getElementById('resp')
+                    .value
+                    .trim();
+
+
+            if (!resp) {
+
+                mostrarAlertaCustomizado(
+                    "Preencha o seu nome no campo RESPONSÁVEL."
+                );
+
                 return;
+
             }
 
-            fetch(urlPlanilha, {
-                method: "POST",
-                mode: "no-cors",
-                headers: {
-                    "Content-Type": "text/plain;charset=UTF-8"
+
+            /* ========================================================
+               2. SALDOS DO SISTEMA
+            ======================================================== */
+
+            const camposSistema = [
+
+                {
+                    id: 'sys_v',
+                    nome: 'PET VIRGEM (0010006)'
                 },
-                body: JSON.stringify(dados)
-            })
-            .then(() => {
-                document.getElementById('modalSucesso').style.display = 'block';
-                gerarEstrutura();
-            })
-            .catch(() => {
-                alert("Erro de comunicação com a planilha. Verifique a internet e tente novamente.");
-            })
-            .finally(() => {
-                btnSalvar.innerText = "SALVAR INVENTÁRIO";
-                btnSalvar.disabled = false;
+
+                {
+                    id: 'sys_0t',
+                    nome: 'PCR 0T (0010048)'
+                },
+
+                {
+                    id: 'sys_10t',
+                    nome: 'PCR 10T (0010030)'
+                },
+
+                {
+                    id: 'sys_acq',
+                    nome: 'ACQUAMIX (0010023)'
+                },
+
+                {
+                    id: 'sys_glo',
+                    nome: 'VALGROUP (0010066)'
+                },
+
+                {
+                    id: 'sys_val',
+                    nome: 'PCR GLOBAL (0010080)'
+                }
+
+            ];
+
+
+            const camposSistemaVazios =
+                camposSistema.filter(campo => {
+
+                    return document
+                        .getElementById(campo.id)
+                        .value
+                        .trim() === "";
+
+                });
+
+
+            if (camposSistemaVazios.length > 0) {
+
+                let mensagem =
+                    "Preencha os saldos na linha SISTEMA.";
+
+
+                if (
+                    camposSistemaVazios.length === 1
+                ) {
+
+                    mensagem +=
+                        "\n\nCampo pendente:";
+
+                    mensagem +=
+                        "\n" +
+                        camposSistemaVazios[0].nome;
+
+                }
+
+                else {
+
+                    mensagem +=
+                        "\n\nCampos pendentes:";
+
+
+                    camposSistemaVazios.forEach(campo => {
+
+                        mensagem +=
+                            "\n• " +
+                            campo.nome;
+
+                    });
+
+                }
+
+
+                mensagem +=
+                    "\n\nCaso não exista saldo, informe 0.";
+
+
+                mostrarAlertaCustomizado(
+                    mensagem
+                );
+
+
+                return;
+
+            }
+
+
+            /* ========================================================
+               3. PONTOS DE CONTAGEM
+            ======================================================== */
+
+            const pontosVazios = [];
+
+
+            itens.forEach((it, i) => {
+
+                const campoPeso =
+                    document.getElementById(
+                        `peso-${i}`
+                    );
+
+
+                /*
+                 * IMPORTANTE:
+                 * value === "" significa vazio.
+                 *
+                 * Se o usuário digitar 0:
+                 * value será "0"
+                 * e NÃO será considerado vazio.
+                 */
+
+                if (
+                    campoPeso.value.trim() === ""
+                ) {
+
+                    pontosVazios.push(
+                        it.p
+                    );
+
+                }
+
             });
+
+
+            if (pontosVazios.length > 0) {
+
+                let mensagem =
+                    "Existem pontos de contagem sem preenchimento.";
+
+
+                /*
+                 * Se forem poucos pontos,
+                 * mostra todos.
+                 */
+
+                if (
+                    pontosVazios.length <= 8
+                ) {
+
+                    mensagem +=
+                        "\n\nPontos pendentes:";
+
+
+                    pontosVazios.forEach(ponto => {
+
+                        mensagem +=
+                            "\n• " +
+                            ponto;
+
+                    });
+
+                }
+
+                /*
+                 * Se forem muitos,
+                 * evita uma janela enorme.
+                 */
+
+                else {
+
+                    mensagem +=
+                        "\n\nExistem " +
+                        pontosVazios.length +
+                        " pontos sem preenchimento.";
+
+                    mensagem +=
+                        "\n\nVerifique a tabela antes de enviar.";
+
+                }
+
+
+                mensagem +=
+                    "\n\nCaso o ponto esteja vazio fisicamente, informe 0.";
+
+
+                mostrarAlertaCustomizado(
+                    mensagem
+                );
+
+
+                return;
+
+            }
+
+
+            /* ========================================================
+               4. DATA / HORA
+            ======================================================== */
+
+            const dt =
+                document.getElementById(
+                    'current-time'
+                ).innerText;
+
+
+            /* ========================================================
+               5. TOTAIS FÍSICOS
+            ======================================================== */
+
+            const tV =
+                document.getElementById(
+                    'tot_v'
+                ).innerText;
+
+            const t0 =
+                document.getElementById(
+                    'tot_0t'
+                ).innerText;
+
+            const t10 =
+                document.getElementById(
+                    'tot_10t'
+                ).innerText;
+
+            const tAcq =
+                document.getElementById(
+                    'tot_acq'
+                ).innerText;
+
+            const tGlo =
+                document.getElementById(
+                    'tot_glo'
+                ).innerText;
+
+            const tVal =
+                document.getElementById(
+                    'tot_val'
+                ).innerText;
+
+
+            /* ========================================================
+               6. SALDOS DO SISTEMA
+            ======================================================== */
+
+            const sysV =
+                document.getElementById(
+                    'sys_v'
+                ).value;
+
+            const sys0 =
+                document.getElementById(
+                    'sys_0t'
+                ).value;
+
+            const sys10 =
+                document.getElementById(
+                    'sys_10t'
+                ).value;
+
+            const sysAcq =
+                document.getElementById(
+                    'sys_acq'
+                ).value;
+
+            const sysGlo =
+                document.getElementById(
+                    'sys_glo'
+                ).value;
+
+            const sysVal =
+                document.getElementById(
+                    'sys_val'
+                ).value;
+
+
+            /* ========================================================
+               7. DIFERENÇAS
+            ======================================================== */
+
+            const dV =
+                document.getElementById(
+                    'dif_v'
+                ).innerText;
+
+            const d0 =
+                document.getElementById(
+                    'dif_0t'
+                ).innerText;
+
+            const d10 =
+                document.getElementById(
+                    'dif_10t'
+                ).innerText;
+
+            const dAcq =
+                document.getElementById(
+                    'dif_acq'
+                ).innerText;
+
+            const dGlo =
+                document.getElementById(
+                    'dif_glo'
+                ).innerText;
+
+            const dVal =
+                document.getElementById(
+                    'dif_val'
+                ).innerText;
+
+
+            /* ========================================================
+               8. DETALHAMENTO DOS PONTOS
+            ======================================================== */
+
+            let detalhePontos =
+                "--- DETALHAMENTO DOS PONTOS DE CONTAGEM ---%0D%0A";
+
+
+            itens.forEach((it, i) => {
+
+                const pesoVal =
+                    document.getElementById(
+                        `peso-${i}`
+                    ).value;
+
+
+                let linha =
+                    `- ${it.p} (${it.l}): ${pesoVal} KG`;
+
+
+                if (it.type === "MIX") {
+
+                    const select =
+                        document.getElementById(
+                            `sel-${i}`
+                        );
+
+
+                    if (
+                        !select ||
+                        !select.value
+                    ) {
+
+                        linha +=
+                            ` | [MIX -> NENHUMA RESINA SELECIONADA (100% PET)]`;
+
+                    }
+
+                    else {
+
+                        const txtResina =
+                            select.options[
+                                select.selectedIndex
+                            ].text;
+
+
+                        const chk =
+                            document.querySelector(
+                                `input[name="m${i}"]:checked`
+                            );
+
+
+                        const proporcao =
+                            chk
+                                ? chk.dataset.val + "%"
+                                : "0% (Apenas PET)";
+
+
+                        linha +=
+                            ` | [MIX -> Resina: ${txtResina} / Proporção: ${proporcao}]`;
+
+                    }
+
+                }
+
+                else {
+
+                    linha +=
+                        ` | [Carga Fixa Base: ${it.type}]`;
+
+                }
+
+
+                detalhePontos +=
+                    linha +
+                    "%0D%0A";
+
+            });
+
+
+            /* ========================================================
+               9. ASSUNTO DO E-MAIL
+            ======================================================== */
+
+            const ass =
+                `Inventário de Resinas - ${resp}`;
+
+
+            /* ========================================================
+               10. CORPO DO E-MAIL
+            ======================================================== */
+
+            const corpo =
+
+                `RELATÓRIO DE INVENTÁRIO DE RESINAS%0D%0A` +
+
+                `Data/Hora: ${dt}%0D%0A` +
+
+                `Responsável: ${resp}%0D%0A%0D%0A` +
+
+                `--- BALANÇO DE SALDOS COMPLETO ---%0D%0A` +
+
+                `1. PET VIRGEM (0010006) -> Contagem: ${tV} KG | Saldo Sistema: ${sysV} KG | Diferença: ${dV} KG%0D%0A` +
+
+                `2. PCR 0T (0010048)     -> Contagem: ${t0} KG | Saldo Sistema: ${sys0} KG | Diferença: ${d0} KG%0D%0A` +
+
+                `3. PCR 10T (0010030)    -> Contagem: ${t10} KG | Saldo Sistema: ${sys10} KG | Diferença: ${d10} KG%0D%0A` +
+
+                `4. ACQUAMIX (0010023)   -> Contagem: ${tAcq} KG | Saldo Sistema: ${sysAcq} KG | Diferença: ${dAcq} KG%0D%0A` +
+
+                `5. VALGROUP (0010066)   -> Contagem: ${tGlo} KG | Saldo Sistema: ${sysGlo} KG | Diferença: ${dGlo} KG%0D%0A` +
+
+                `6. PCR GLOBAL (0010080) -> Contagem: ${tVal} KG | Saldo Sistema: ${sysVal} KG | Diferença: ${dVal} KG%0D%0A%0D%0A` +
+
+                detalhePontos +
+
+                `-------------------------------------------%0D%0A` +
+
+                `Enviado via App Inventário Spiltag.`;
+
+
+            /* ========================================================
+               11. ABRE O OUTLOOK / CLIENTE DE E-MAIL
+            ======================================================== */
+
+            window.location.href =
+                `mailto:joao.pedroso@spiltag.com` +
+
+                `?cc=quenia.oliveira@spiltag.com` +
+
+                `&subject=${encodeURIComponent(ass)}` +
+
+                `&body=${corpo}`;
+
         }
 
-        window.onload = () => {
-            setInterval(() => { document.getElementById('data-hora').innerText = new Date().toLocaleString(); }, 1000);
-        };
-
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('PWA Spiltag registrado com sucesso!', reg))
-                    .catch(err => console.error('Erro ao registrar PWA:', err));
-            });
-        }
     </script>
 
-    <div id="modalCalc" class="modal"><div class="modal-content"><h3>Calculadora</h3><input type="number" id="p-t" class="calc-input" placeholder="Peso (g)"><input type="number" id="q-m" class="calc-input" placeholder="Miolos"><div class="modal-btns"><button class="btn-confirm" onclick="aplicarCalculo()">APLICAR</button><button class="btn-no" onclick="fecharModais()">CANCELAR</button></div></div></div>
-    <div id="modalAvisoResp" class="modal"><div class="modal-content"><h3>⚠ Campo Obrigatório</h3><p>Preencha o nome do <b>RESPONSÁVEL</b>.</p><div class="modal-btns"><button class="btn-confirm" onclick="fecharModais()">OK</button></div></div></div>
-    <div id="modalSucesso" class="modal"><div class="modal-content"><h3>✔ SUCESSO!</h3><p>DADOS SALVOS COM SUCESSO.</p><div class="modal-btns"><button class="btn-confirm" onclick="fecharModais()">OK</button></div></div></div>
-    <div id="modalSairPerg" class="modal"><div class="modal-content"><h3>Sair do Sistema</h3><p>Deseja fechar o formulário de inventário?</p><div class="modal-btns"><button class="btn-confirm" onclick="logoutDireto()" style="background:#000;">SIM, SAIR</button><button class="btn-no" onclick="fecharModais()">VOLTAR</button></div></div></div>
 </body>
 </html>
