@@ -1,8 +1,7 @@
 {
   "name": "Contagem de Resina - Spiltag",
   "short_name": "Contagem de Resina",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#f4f4f4",
   "theme_color": "#a51c30",
